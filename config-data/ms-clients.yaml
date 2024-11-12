@@ -1,0 +1,21 @@
+server:
+  #SERVER_PORT = 8090
+  port: 8090
+spring:
+  #DB_HOST = localhost
+  #DB_PORT = 5432
+  #DB_DBNAME = tingeso-clients-db
+  #DB_USER = postgres
+  #DB_PASSWORD = admin
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tingeso-clients-db
+    username: postgres
+    password: admin
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://eureka-server-service:8761/eureka/
