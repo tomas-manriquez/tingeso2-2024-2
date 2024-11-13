@@ -8,14 +8,18 @@
         <outputRelativeToContentRoot value="true" />
         <module name="config-server" />
         <module name="eureka-server" />
-        <module name="ms-clients" />
+        <module name="gateway-server" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ms-clients" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="config-server" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
+      <module name="gateway-server" options="-parameters" />
       <module name="ms-clients" options="-parameters" />
     </option>
   </component>

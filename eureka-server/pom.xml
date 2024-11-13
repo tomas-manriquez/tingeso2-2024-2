@@ -12,7 +12,7 @@
 	<artifactId>eureka-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>eureka-server</name>
-	<description>API Gateway (eureka)</description>
+	<description>Discovery Server (eureka)</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -45,6 +45,12 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bootstrap</artifactId>
+		</dependency>
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
