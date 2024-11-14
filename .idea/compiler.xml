@@ -7,8 +7,9 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="config-server" />
-        <module name="eureka-server" />
         <module name="gateway-server" />
+        <module name="m2-registro-usuario" />
+        <module name="eureka-server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -20,6 +21,7 @@
       <module name="config-server" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
       <module name="gateway-server" options="-parameters" />
+      <module name="m2-registro-usuario" options="-parameters" />
       <module name="ms-clients" options="-parameters" />
     </option>
   </component>

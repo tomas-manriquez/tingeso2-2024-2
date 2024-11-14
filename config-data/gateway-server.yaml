@@ -18,10 +18,10 @@ spring:
           enabled: true
       routes:
           #TODO 6 rutas para cada microservicio
-        - id: student-service
-          uri: lb://student-service
+        - id: m2-registro-usuario
+          uri: lb://m2-registro-usuario
           predicates:
-            - Path=/student/**
+            - Path=/m2-registro-usuario/**
         - id: book-service
           uri: lb://book-service
           predicates:

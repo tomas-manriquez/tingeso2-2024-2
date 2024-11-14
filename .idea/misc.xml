@@ -8,6 +8,7 @@
         <option value="$PROJECT_DIR$/ms-clients/pom.xml" />
         <option value="$PROJECT_DIR$/eureka-server/pom.xml" />
         <option value="$PROJECT_DIR$/gateway-server/pom.xml" />
+        <option value="$PROJECT_DIR$/m2-registro-usuario/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
