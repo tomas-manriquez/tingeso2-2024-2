@@ -1,16 +1,19 @@
 package com.tingeso.m2_registro_usuario.model;
 
-import jakarta.persistence.ElementCollection;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Credit {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long creditId;
     //Financial eval
     private Long FinEvalId;

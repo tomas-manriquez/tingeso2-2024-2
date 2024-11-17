@@ -9,6 +9,7 @@ eureka:
       default-zone: http://localhost:8761/eureka
   instance:
     hostname: localhost
+    #preferIpAddress: true
 
 spring:
   cloud:
@@ -16,12 +17,21 @@ spring:
       discovery:
         locator:
           enabled: true
+        default-filters:
+          - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: '*'
+            allowedMethods: "*"
+            allowedHeaders: "*"
       routes:
           #TODO 6 rutas para cada microservicio
         - id: m2-registro-usuario
           uri: lb://m2-registro-usuario
           predicates:
-            - Path=/m2-registro-usuario/**
+            - Path=/simulation/**
         - id: book-service
           uri: lb://book-service
           predicates:
