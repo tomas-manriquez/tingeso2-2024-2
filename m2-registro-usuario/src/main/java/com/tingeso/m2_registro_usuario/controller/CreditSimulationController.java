@@ -13,9 +13,9 @@ public class CreditSimulationController {
     CreditSimulationService creditSimulationService;
 
     @GetMapping("/get")
-    public Long simulation(@RequestBody Credit credit)
+    public double simulation(@RequestBody Credit credit)
     {
-        return creditSimulationService.creditSimulation();
+        return creditSimulationService.creditSimulation(credit);
     }
 
     @GetMapping("/example")

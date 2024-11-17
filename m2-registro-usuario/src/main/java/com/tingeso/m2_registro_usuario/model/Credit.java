@@ -16,12 +16,13 @@ public class Credit {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long creditId;
     //Financial eval
-    private Long FinEvalId;
+    private Long finEvalId;
     private String type;
     private Integer maxPayTerm;             //years
-    private Float annualInterestRate;
+    private Double annualInterestRate;
     private Float maxFinanceAmount;         //percentage
-    private Long propertyValue;
+    private Long propertyValue;             //Valor en CLP
+    private Long requestedAmount;
     @ElementCollection
     private List<Float> totalFees;
 
