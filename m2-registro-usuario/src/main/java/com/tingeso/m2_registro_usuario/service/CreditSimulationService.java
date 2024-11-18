@@ -1,10 +1,9 @@
-package com.tingeso.m1_simulacion_credito.service;
+package com.tingeso.m2_registro_usuario.service;
 
-import com.tingeso.m1_simulacion_credito.model.Credit;
-import com.tingeso.m1_simulacion_credito.repository.CreditSimulationRepository;
+import com.tingeso.m2_registro_usuario.model.Credit;
+import com.tingeso.m2_registro_usuario.repository.CreditSimulationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class CreditSimulationService {

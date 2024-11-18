@@ -1,6 +1,6 @@
-package com.tingeso.m1_simulacion_credito.repository;
+package com.tingeso.m2_registro_usuario.repository;
 
-import com.tingeso.m1_simulacion_credito.model.Credit;
+import com.tingeso.m2_registro_usuario.model.Credit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

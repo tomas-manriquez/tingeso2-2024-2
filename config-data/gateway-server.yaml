@@ -28,14 +28,10 @@ spring:
             allowedHeaders: "*"
       routes:
           #TODO 6 rutas para cada microservicio
-        - id: m1-simulacion-credito
-          uri: lb://m1-simulacion-usuario
-          predicates:
-            - Path=/simulation/**
         - id: m2-registro-usuario
           uri: lb://m2-registro-usuario
           predicates:
-            - Path=/register/**
+            - Path=/simulation/**
         - id: book-service
           uri: lb://book-service
           predicates:
