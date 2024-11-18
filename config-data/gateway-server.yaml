@@ -32,10 +32,11 @@ spring:
           uri: lb://m2-registro-usuario
           predicates:
             - Path=/simulation/**
-        - id: book-service
-          uri: lb://book-service
+        - id: actual-registro-usuario
+          uri: lb://actual-registro-usuario
           predicates:
-            - Path=/book/**
+            - Path=/register/**
+
         - id: pet-service
           uri: lb://pet-service
           predicates:

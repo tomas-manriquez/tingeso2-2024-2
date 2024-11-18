@@ -10,16 +10,18 @@
         <module name="config-server" />
         <module name="gateway-server" />
         <module name="m2-registro-usuario" />
-        <module name="m1-simulacion-credito" />
+        <module name="actual-registro-usuario" />
         <module name="eureka-server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="m1-simulacion-credito" target="17" />
       <module name="ms-clients" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="actual-registro-usuario" options="-parameters" />
       <module name="config-server" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
       <module name="gateway-server" options="-parameters" />

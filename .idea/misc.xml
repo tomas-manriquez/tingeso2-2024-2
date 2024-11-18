@@ -10,6 +10,7 @@
         <option value="$PROJECT_DIR$/gateway-server/pom.xml" />
         <option value="$PROJECT_DIR$/m2-registro-usuario/pom.xml" />
         <option value="$PROJECT_DIR$/m1-simulacion-credito/pom.xml" />
+        <option value="$PROJECT_DIR$/actual-registro-usuario/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: m1-simulacion-credito
+    name: actual-registro-usuario
   cloud:
     config:
       enabled: true
@@ -12,5 +12,5 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-#server:
+  #server:
   #port: 8081
