@@ -10,6 +10,7 @@
         <module name="config-server" />
         <module name="gateway-server" />
         <module name="m2-registro-usuario" />
+        <module name="m1-simulacion-credito" />
         <module name="eureka-server" />
       </profile>
     </annotationProcessing>
@@ -22,6 +23,7 @@
       <module name="config-server" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
       <module name="gateway-server" options="-parameters" />
+      <module name="m1-simulacion-credito" options="-parameters" />
       <module name="m2-registro-usuario" options="-parameters" />
       <module name="ms-clients" options="-parameters" />
     </option>

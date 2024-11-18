@@ -1,7 +1,7 @@
-package com.tingeso.m2_registro_usuario.controller;
+package com.tingeso.m1_simulacion_credito.controller;
 
-import com.tingeso.m2_registro_usuario.model.Credit;
-import com.tingeso.m2_registro_usuario.service.CreditSimulationService;
+import com.tingeso.m1_simulacion_credito.model.Credit;
+import com.tingeso.m1_simulacion_credito.service.CreditSimulationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
