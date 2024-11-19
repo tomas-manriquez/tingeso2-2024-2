@@ -1,4 +1,4 @@
-package com.tingeso.m3_solicitud_credito.entity;
+package com.tingeso.m4_evaluacion_credito.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FinEvalEntity {
+public class FinEval {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)

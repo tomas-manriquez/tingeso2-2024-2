@@ -1,4 +1,4 @@
-package com.tingeso.m2_registro_usuario.model;
+package com.tingeso.m4_evaluacion_credito.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

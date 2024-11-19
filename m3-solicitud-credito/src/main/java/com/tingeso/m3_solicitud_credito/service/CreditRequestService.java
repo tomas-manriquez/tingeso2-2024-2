@@ -6,17 +6,11 @@ import com.tingeso.m3_solicitud_credito.model.User;
 import com.tingeso.m3_solicitud_credito.repository.CreditRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 
 
 @Service
 public class CreditRequestService {
-    //@Autowired
-    //CreditRequestRepository creditRequestRepository;
-
-    //@Autowired
-    //RestTemplate restTemplate;
 
     CreditRequestRepository creditRequestRepository;
     UserFeignClient userFeignClient;
@@ -86,4 +80,6 @@ public class CreditRequestService {
     }
 
     public FinEvalEntity findById(Long id){return creditRequestRepository.findById(id).orElse(null);}
+
+    public FinEvalEntity save(FinEvalEntity requestNew){return creditRequestRepository.save(requestNew);}
 }

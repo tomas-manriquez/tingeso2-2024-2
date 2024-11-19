@@ -26,4 +26,10 @@ public class CreditRequestController {
     {
         return creditRequestService.findById(id);
     }
+
+    @PostMapping("/save")
+    public FinEvalEntity save(@RequestBody FinEvalEntity finEvalEntity)
+    {
+        return creditRequestService.save(finEvalEntity);
+    }
 }

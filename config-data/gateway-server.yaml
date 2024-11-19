@@ -41,3 +41,8 @@ spring:
           uri: lb://m3-solicitud-credito
           predicates:
             - Path=/credit-request/**
+
+        - id: m4-evaluacion-credito
+          uri: lb://m4-evaluacion-credito
+          predicates:
+            - Path=/credit-eval/**
