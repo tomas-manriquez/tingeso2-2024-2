@@ -25,9 +25,6 @@ public class CreditRequestService {
     //casos 'false' se generar por cliente solicitante que no esta registrado
     public boolean makeRequest(FinEvalEntity requestNew)
     {
-         User user = restTemplate.getForObject("http://book-service/book/bystudent/" + requestNew.getUserId(), User.class);
-        if (user!=null)
-        {
             if ( requestNew.getMonthlyCreditFee()!= null
                     && requestNew.getMonthlyClientIncome()!=null && requestNew.getCurrentJobAntiquity()!=null
                     && requestNew.getMonthlyDebt() != null && requestNew.getBankAccountBalance()!=null)
@@ -67,11 +64,7 @@ public class CreditRequestService {
                 creditRequestRepository.save(requestNew);
                 return true;
             }
-        }
-        else
-        {
-            return false;
-        }
+
     }
 
     public FinEvalEntity findById(Long id){return creditRequestRepository.findById(id).orElse(null);}
