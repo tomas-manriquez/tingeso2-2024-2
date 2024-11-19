@@ -36,7 +36,7 @@ public class CreditRequestService {
     public boolean makeRequest(FinEvalEntity requestNew)
     {
         //User user = restTemplate.getForObject("http://actual-registro-usuario/request/" + requestNew.getUserId(), User.class);
-        User user = this.userFeignClient.findById(requestNew.getUserId());
+        User user = userFeignClient.findById(requestNew.getUserId());
         if (user!=null)
         {
             if ( requestNew.getMonthlyCreditFee()!= null
