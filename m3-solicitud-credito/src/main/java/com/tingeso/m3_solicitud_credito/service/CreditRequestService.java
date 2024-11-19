@@ -1,5 +1,6 @@
 package com.tingeso.m3_solicitud_credito.service;
 
+import com.tingeso.m3_solicitud_credito.clients.UserFeignClient;
 import com.tingeso.m3_solicitud_credito.entity.FinEvalEntity;
 import com.tingeso.m3_solicitud_credito.model.User;
 import com.tingeso.m3_solicitud_credito.repository.CreditRequestRepository;
@@ -11,12 +12,21 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class CreditRequestService {
-    @Autowired
+    //@Autowired
+    //CreditRequestRepository creditRequestRepository;
+
+    //@Autowired
+    //RestTemplate restTemplate;
+
     CreditRequestRepository creditRequestRepository;
+    UserFeignClient userFeignClient;
 
     @Autowired
-    RestTemplate restTemplate;
-
+    public CreditRequestService(CreditRequestRepository creditRequestRepository,
+                        UserFeignClient userFeignClient) {
+        this.creditRequestRepository = creditRequestRepository;
+        this.userFeignClient = userFeignClient;
+    }
 
 
     //P3: Solicitud de Credito
@@ -25,6 +35,10 @@ public class CreditRequestService {
     //casos 'false' se generar por cliente solicitante que no esta registrado
     public boolean makeRequest(FinEvalEntity requestNew)
     {
+        //User user = restTemplate.getForObject("http://actual-registro-usuario/request/" + requestNew.getUserId(), User.class);
+        User user = this.userFeignClient.findById(requestNew.getUserId());
+        if (user!=null)
+        {
             if ( requestNew.getMonthlyCreditFee()!= null
                     && requestNew.getMonthlyClientIncome()!=null && requestNew.getCurrentJobAntiquity()!=null
                     && requestNew.getMonthlyDebt() != null && requestNew.getBankAccountBalance()!=null)
@@ -64,7 +78,11 @@ public class CreditRequestService {
                 creditRequestRepository.save(requestNew);
                 return true;
             }
-
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public FinEvalEntity findById(Long id){return creditRequestRepository.findById(id).orElse(null);}
