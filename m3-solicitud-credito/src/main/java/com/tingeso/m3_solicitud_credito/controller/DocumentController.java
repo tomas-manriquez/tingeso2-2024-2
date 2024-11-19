@@ -3,9 +3,6 @@ package com.tingeso.m3_solicitud_credito.controller;
 import com.tingeso.m3_solicitud_credito.entity.DocumentEntity;
 import com.tingeso.m3_solicitud_credito.service.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,28 +16,48 @@ public class DocumentController {
     @Autowired
     DocumentService documentService;
 
-    @GetMapping("/{id}")
-    public DocumentEntity findById(@PathVariable Long id) {return documentService.findById(id);}
 
-    @PostMapping(value="/save", consumes = {"application/json"})
-    public DocumentEntity save(@RequestBody MultipartFile file ) throws IOException {
+    /**
+     * Endpoint to upload a document for a specific financial evaluation
+     *
+     * @param file The PDF or document file to upload
+     * @param finEvalId The ID of the financial evaluation
+     * @return ResponseEntity with the saved DocumentEntity
+     */
+    @PostMapping("/upload/{finEvalId}")
+    public ResponseEntity<?> uploadFinancialEvaluationDocument(
+            @RequestParam("file") MultipartFile file,
+            @PathVariable Long finEvalId
+    ) {
+        try {
+            // Validate file is not empty
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("File cannot be empty");
+            }
 
-        return documentService.save(file);
+            // Save the document
+            DocumentEntity savedDocument = documentService.saveFinancialEvaluationDocument(file, finEvalId);
+
+            // Return successful response with saved document
+            return ResponseEntity.ok(savedDocument);
+
+        } catch (IOException e) {
+            // Handle file processing errors
+            return ResponseEntity.internalServerError().body("Error processing file: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            // Handle validation errors
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    @GetMapping("/download/{id}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id) {
-        try {
-            DocumentEntity document = documentService.retrieveFile(id);
-
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(document.getType())) // MIME type from DocumentEntity
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + "\"")
-                    .body(document.getFile()); // File content as byte array
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+    /**
+     * Retrieve a document by its ID
+     *
+     * @param documentId The ID of the document to retrieve
+     * @return ResponseEntity with the DocumentEntity
+     */
+    @GetMapping("/{documentId}")
+    public DocumentEntity getDocument(@PathVariable Long documentId) {
+        return documentService.findById(documentId);
     }
 }

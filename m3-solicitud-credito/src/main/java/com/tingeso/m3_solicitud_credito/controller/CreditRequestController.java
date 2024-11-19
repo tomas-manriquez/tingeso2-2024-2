@@ -1,5 +1,6 @@
 package com.tingeso.m3_solicitud_credito.controller;
 
+import com.tingeso.m3_solicitud_credito.entity.CreditEntity;
 import com.tingeso.m3_solicitud_credito.entity.FinEvalEntity;
 import com.tingeso.m3_solicitud_credito.service.CreditRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,10 @@ public class CreditRequestController {
     @GetMapping("/example")
     public String example() {return "test de m3-solicitud-credito";}
 
-    @PostMapping("/")
-    public boolean makeRequest(@RequestBody FinEvalEntity finEvalEntity)
+    @PostMapping("/make/{userid}")
+    public boolean makeRequest(@PathVariable Long userid, @RequestBody CreditEntity creditEntity)
     {
-        return creditRequestService.makeRequest(finEvalEntity);
+        return creditRequestService.makeRequest(userid, creditEntity);
     }
 
     @GetMapping("/{id}")

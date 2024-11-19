@@ -1,8 +1,10 @@
 package com.tingeso.m3_solicitud_credito.service;
 
 import com.tingeso.m3_solicitud_credito.clients.UserFeignClient;
+import com.tingeso.m3_solicitud_credito.entity.CreditEntity;
 import com.tingeso.m3_solicitud_credito.entity.FinEvalEntity;
 import com.tingeso.m3_solicitud_credito.model.User;
+import com.tingeso.m3_solicitud_credito.repository.CreditRepository;
 import com.tingeso.m3_solicitud_credito.repository.CreditRequestRepository;
 import com.tingeso.m3_solicitud_credito.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,27 +15,29 @@ import org.springframework.stereotype.Service;
 @Service
 public class CreditRequestService {
 
+    private final CreditRepository creditRepository;
     CreditRequestRepository creditRequestRepository;
-    DocumentRepository documentRepository;
     UserFeignClient userFeignClient;
 
     @Autowired
     public CreditRequestService(CreditRequestRepository creditRequestRepository,
-                        UserFeignClient userFeignClient) {
+                                UserFeignClient userFeignClient, CreditRepository creditRepository) {
         this.creditRequestRepository = creditRequestRepository;
         this.userFeignClient = userFeignClient;
+        this.creditRepository = creditRepository;
     }
 
 
     //P3: Solicitud de Credito
-    //Entrada: RequestEntity request
-    //Salida: 'true' si se registro la solicitud con exito, 'false' en otro caso
+    //Entrada: CreditEntity credito
+    //Salida: 'true' si se registro la solicitud (FinEvalEntity) con exito, 'false' en otro caso
     //casos 'false' se generar por cliente solicitante que no esta registrado
-    public boolean makeRequest(FinEvalEntity requestNew)
+    public boolean makeRequest(Long userId, CreditEntity credit)
     {
-        User user = userFeignClient.findById(requestNew.getUserId());
+        User user = userFeignClient.findById(userId);
         if (user!=null)
         {
+            FinEvalEntity requestNew = new FinEvalEntity();
             if ( requestNew.getMonthlyCreditFee()!= null
                     && requestNew.getMonthlyClientIncome()!=null && requestNew.getCurrentJobAntiquity()!=null
                     && requestNew.getMonthlyDebt() != null && requestNew.getBankAccountBalance()!=null)
@@ -54,6 +58,8 @@ public class CreditRequestService {
                     requestNew.setStatus("E2");
 
                     creditRequestRepository.save(requestNew);
+                    credit.setFinEvalId(requestNew.getFinEvalId());
+                    creditRepository.save(credit);
                     return true;
                 }
                 else
@@ -62,6 +68,8 @@ public class CreditRequestService {
                     //Se ingresa request en estado 'E3'
                     requestNew.setStatus("E3");
                     creditRequestRepository.save(requestNew);
+                    credit.setFinEvalId(requestNew.getFinEvalId());
+                    creditRepository.save(credit);
                     return true;
                 }
             }
@@ -71,6 +79,8 @@ public class CreditRequestService {
                 //Se ingresa request en estado 'E1'
                 requestNew.setStatus("E1");
                 creditRequestRepository.save(requestNew);
+                credit.setFinEvalId(requestNew.getFinEvalId());
+                creditRepository.save(credit);
                 return true;
             }
         }
