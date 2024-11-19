@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.tingeso</groupId>
-	<artifactId>actual-registro-usuario</artifactId>
+	<artifactId>m3-solicitud-credito</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>actual-registro-usuario</name>
-	<description>P2 Registro de Usuario</description>
+	<name>m3-solicitud-credito</name>
+	<description>P3 Solicitud de Credito</description>
 	<url/>
 	<licenses>
 		<license/>

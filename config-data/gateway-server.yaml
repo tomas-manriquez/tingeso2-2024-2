@@ -37,7 +37,7 @@ spring:
           predicates:
             - Path=/register/**
 
-        - id: pet-service
-          uri: lb://pet-service
+        - id: m3-solicitud-credito
+          uri: lb://m3-solicitud-credito
           predicates:
-            - Path=/pet/**
+            - Path=/credit-request/**

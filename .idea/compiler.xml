@@ -7,6 +7,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="m3-solicitud-credito" />
         <module name="config-server" />
         <module name="gateway-server" />
         <module name="m2-registro-usuario" />
@@ -27,6 +28,7 @@
       <module name="gateway-server" options="-parameters" />
       <module name="m1-simulacion-credito" options="-parameters" />
       <module name="m2-registro-usuario" options="-parameters" />
+      <module name="m3-solicitud-credito" options="-parameters" />
       <module name="ms-clients" options="-parameters" />
     </option>
   </component>
