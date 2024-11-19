@@ -4,6 +4,7 @@ import com.tingeso.m3_solicitud_credito.clients.UserFeignClient;
 import com.tingeso.m3_solicitud_credito.entity.FinEvalEntity;
 import com.tingeso.m3_solicitud_credito.model.User;
 import com.tingeso.m3_solicitud_credito.repository.CreditRequestRepository;
+import com.tingeso.m3_solicitud_credito.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class CreditRequestService {
 
     CreditRequestRepository creditRequestRepository;
+    DocumentRepository documentRepository;
     UserFeignClient userFeignClient;
 
     @Autowired
@@ -29,7 +31,6 @@ public class CreditRequestService {
     //casos 'false' se generar por cliente solicitante que no esta registrado
     public boolean makeRequest(FinEvalEntity requestNew)
     {
-        //User user = restTemplate.getForObject("http://actual-registro-usuario/request/" + requestNew.getUserId(), User.class);
         User user = userFeignClient.findById(requestNew.getUserId());
         if (user!=null)
         {

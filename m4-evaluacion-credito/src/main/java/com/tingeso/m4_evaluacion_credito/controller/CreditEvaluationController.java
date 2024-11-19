@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin("*")
 public class CreditEvaluationController {
     @GetMapping("/example")
-    public String example() {return "test de m3-solicitud-credito";}
-
+    public String example() {return "test de m4-evaluacion-credito";}
 
 }
