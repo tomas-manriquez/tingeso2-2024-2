@@ -1,6 +1,7 @@
 package com.tingeso.m4_evaluacion_credito.clients;
 
 import com.tingeso.m4_evaluacion_credito.config.FeignClientConfig;
+import com.tingeso.m4_evaluacion_credito.model.Credit;
 import com.tingeso.m4_evaluacion_credito.model.FinEval;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,4 +18,11 @@ public interface FinEvalFeignClient {
 
     @PostMapping("/save")
     FinEval save(@RequestBody FinEval finEvalEntity);
+
+    //Credit
+    @GetMapping("/credit/{id}")
+    Credit findByCreditId(@PathVariable Long id);
+
+    @PostMapping("/credit/save")
+    Credit saveCredit(@RequestBody Credit credit);
 }

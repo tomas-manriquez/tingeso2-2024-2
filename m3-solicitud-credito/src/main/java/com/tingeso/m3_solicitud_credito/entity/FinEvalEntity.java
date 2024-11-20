@@ -31,7 +31,7 @@ public class FinEvalEntity {
     private Integer currentJobAntiquity;
     private Boolean isSelfEmployed;
     private Boolean hasGoodIncomeHistory;
-    private Long monthlyDebt;
+    private Double monthlyDebt;
     //Para P4.R7.R74
     private Long bankAccountBalance;
     //Para P4.R7.R72

@@ -13,9 +13,9 @@ public class CreditController {
     CreditService creditService;
 
     @GetMapping("/{id}")
-    public CreditEntity findById(@PathVariable Long id) {return creditService.findById(id);}
+    public CreditEntity findByCreditId(@PathVariable Long id) {return creditService.findById(id);}
 
     @PostMapping("/save")
-    public CreditEntity save(@RequestBody CreditEntity credit) {return creditService.save(credit);}
+    public CreditEntity saveCredit(@RequestBody CreditEntity credit) {return creditService.save(credit);}
 
 }
