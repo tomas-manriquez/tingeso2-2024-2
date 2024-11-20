@@ -51,3 +51,8 @@ spring:
           uri: lb://m5-seguimiento-solicitud
           predicates:
             - Path=/track-request/**
+
+        - id: m6-calculo-costos-totales
+          uri: lb://m6-calculo-costos-totales
+          predicates:
+            - Path=/total-cost-calc/**
