@@ -1,6 +1,7 @@
 package com.tingeso.m4_evaluacion_credito.controller;
 
 
+import com.tingeso.m4_evaluacion_credito.model.FinEval;
 import com.tingeso.m4_evaluacion_credito.service.CreditEvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,4 +23,7 @@ public class CreditEvaluationController {
         creditEvaluationService.findByCreditId(id);
         return "feign User + FinEval + Credit: exito";
     }
+
+    @PostMapping("/{id}")
+    public FinEval requestEvaluation(@RequestBody FinEval finEval,@PathVariable Long id) {return creditEvaluationService.requestEvaluation(finEval, id);}
 }

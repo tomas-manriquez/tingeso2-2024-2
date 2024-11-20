@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: m5-seguimiento-solicitud
+  cloud:
+    config:
+      enabled: true
+      uri: http://localhost:8888
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tingeso-users-db
+    username: postgres
+    password: admin
+  jpa:
+    hibernate:
+      ddl-auto: update

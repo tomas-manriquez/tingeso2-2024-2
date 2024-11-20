@@ -46,3 +46,8 @@ spring:
           uri: lb://m4-evaluacion-credito
           predicates:
             - Path=/credit-eval/**
+
+        - id: m5-seguimiento-solicitud
+          uri: lb://m5-seguimiento-solicitud
+          predicates:
+            - Path=/track-request/**
