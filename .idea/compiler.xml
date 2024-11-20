@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="config-server" />
         <module name="m2-registro-usuario" />
+        <module name="m6-calculo-costos-totales" />
         <module name="actual-registro-usuario" />
         <module name="m4-evaluacion-credito" />
         <module name="m3-solicitud-credito" />
@@ -33,6 +34,7 @@
       <module name="m3-solicitud-credito" options="-parameters" />
       <module name="m4-evaluacion-credito" options="-parameters" />
       <module name="m5-seguimiento-solicitud" options="-parameters" />
+      <module name="m6-calculo-costos-totales" options="-parameters" />
       <module name="ms-clients" options="-parameters" />
     </option>
   </component>
