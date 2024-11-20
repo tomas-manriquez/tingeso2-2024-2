@@ -1,7 +1,7 @@
-package com.tingeso.m4_evaluacion_credito.clients;
+package com.tingeso.m6_calculo_costos_totales.clients;
 
-import com.tingeso.m4_evaluacion_credito.config.FeignClientConfig;
-import com.tingeso.m4_evaluacion_credito.model.Credit;
+import com.tingeso.m6_calculo_costos_totales.config.FeignClientConfig;
+import com.tingeso.m6_calculo_costos_totales.model.Credit;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
         path = "/simulation",
         configuration = {FeignClientConfig.class})
 public interface SimulationFeignClient {
+
     @GetMapping("/")
     double simulation(@RequestBody Credit credit);
 }

@@ -12,8 +12,8 @@ public class CreditSimulationController {
     @Autowired
     CreditSimulationService creditSimulationService;
 
-    @GetMapping("/get")
-    public double simulation(@RequestBody Credit credit) {return creditSimulationService.creditSimulation(credit);}
+    @GetMapping("/")
+    public Double simulation(@RequestBody Credit credit) {return creditSimulationService.creditSimulation(credit);}
 
     @GetMapping("/example")
     public String example() {return "test de m2-registro-usuario";}

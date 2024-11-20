@@ -70,7 +70,6 @@ public class CreditEvaluationService {
                             return request;
                         }
                     }
-                    //TODO SimulationFeignClient
                     Double totalCostMonthly = simulationFeignClient.simulation(credit);
                     request.setMonthlyDebt(totalCostMonthly);
                     float feeIncomeRate = (request.getMonthlyCreditFee().floatValue() / request.getMonthlyDebt().floatValue());
