@@ -5,8 +5,6 @@ spring:
     config:
       enabled: true
       uri: http://localhost:8888
-  config:
-    import: configserver:http://localhost:8888
   datasource:
     url: jdbc:postgresql://localhost:5432/tingeso-users-db
     username: postgres

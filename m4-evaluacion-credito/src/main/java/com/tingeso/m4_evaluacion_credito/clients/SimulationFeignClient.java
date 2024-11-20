@@ -11,5 +11,5 @@ import org.springframework.web.bind.annotation.RequestBody;
         configuration = {FeignClientConfig.class})
 public interface SimulationFeignClient {
     @GetMapping("/")
-    double simulation(@RequestBody Credit credit);
+    Double simulation(@RequestBody Credit credit);
 }
