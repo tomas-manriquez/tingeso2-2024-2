@@ -7,6 +7,7 @@ import com.tingeso.m4_evaluacion_credito.model.Credit;
 import com.tingeso.m4_evaluacion_credito.model.FinEval;
 import com.tingeso.m4_evaluacion_credito.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -70,7 +71,15 @@ public class CreditEvaluationService {
                             return request;
                         }
                     }
-                    Double totalCostMonthly = simulationFeignClient.simulation(credit);
+                    Double totalCostMonthly;
+                    ResponseEntity<Double> response = simulationFeignClient.simulation(credit);
+                    if (response.hasBody()) {
+                        totalCostMonthly = simulationFeignClient.simulation(credit).getBody();
+                    }
+                    else
+                    {
+                        return null;
+                    }
                     request.setMonthlyDebt(totalCostMonthly);
                     float feeIncomeRate = (request.getMonthlyCreditFee().floatValue() / request.getMonthlyDebt().floatValue());
                     if (feeIncomeRate > 0.35D) //Falla R1, solicitud rechazada

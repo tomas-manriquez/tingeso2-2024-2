@@ -1,0 +1,27 @@
+pipeline{
+    agent any
+    stages{
+        stage("Build Frontend"){
+            steps{
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/tomas-manriquez/tingeso-2024-2']])
+                dir("tingeso-front-end"){
+                    sh "npm install npm"
+                    sh "npm install"
+                    sh "npm run build"
+                }
+            }
+        }
+        stage("Build and Push Docker Image"){
+            steps{
+                dir("tingeso-front-end"){
+                    script{
+                        withDockerRegistry(credentialsId: 'docker-credentials'){
+                            sh "docker build -t tomasmanriquez480/frontend-image:latest ."
+                            sh "docker push tomasmanriquez480/frontend-image:latest"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
