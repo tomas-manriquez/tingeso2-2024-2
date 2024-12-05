@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/total-cost-calc")
-@CrossOrigin("*")
+//@CrossOrigin("*")
 public class TotalCostCalcController {
     @Autowired
     TotalCostCalcService totalCostCalcService;
@@ -15,6 +15,6 @@ public class TotalCostCalcController {
     @GetMapping("/example")
     public String example() {return "test de m6-calculo-costos-totales";}
 
-    @GetMapping("/calc")
+    @PostMapping("/calc")
     public Double totalCostCalculation(@RequestBody Credit credit) {return totalCostCalcService.totalCostCalculation(credit);}
 }

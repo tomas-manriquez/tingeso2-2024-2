@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import requestService from "../services/request.service.js";
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
+import CreditRequestService from "../services/m3-solicitud-credito.service.js";
+import TrackRequestService from "../services/m5-seguimiento-solicitud.service.js"
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell  from "@mui/material/TableCell";
@@ -8,19 +10,21 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import Button from "@mui/material/Button";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MoreTimeIcon from '@mui/icons-material/MoreTime';
+import InfoIcon from '@mui/icons-material/Info';
 
 const RequestList = () => {
     const [requests, setRequests] = useState([]);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [trackDetails, setTrackDetails] = useState('');
 
     const navigate = useNavigate();
 
     const init = () => {
-        requestService
-            .getAll()
+        CreditRequestService
+            .getAllCreditRequestsWithCredits()
             .then((response) => {
                 console.log("Mostrando listado de todos las Solicitudes", response.data);
                 setRequests(response.data);
@@ -43,7 +47,7 @@ const RequestList = () => {
             "¿Esta seguro que desea borrar esta Solicitud?"
         );
         if (confirmDelete) {
-            requestService
+            CreditRequestService
                 .remove(id)
                 .then((response) => {
                     console.log("Solicitud ha sido eliminada.", response.data);
@@ -61,6 +65,19 @@ const RequestList = () => {
     const handleEdit = (id) => {
         console.log("Printing id", id);
         navigate(`/request/edit/${id}`);
+    };
+
+    const handleStatus = (id) =>{
+        TrackRequestService.trackRequest(id)
+            .then((response) => {
+                setTrackDetails(response.data);
+                setOpenDialog(true);
+            })
+            .catch((error) => {
+                console.log("Error tracking request", error);
+                setTrackDetails('No se pudieron obtener los detalles de seguimiento');
+                setOpenDialog(true);
+            });
     };
 
     return (
@@ -83,31 +100,39 @@ const RequestList = () => {
                 <TableHead>
                     <TableRow>
                         <TableCell align="left" sx={{ fontWeight: "bold" }}>
-                            Rut Cliente
+                           UserId
                         </TableCell>
                         <TableCell align="left" sx={{ fontWeight: "bold" }}>
-                            Tipo
+                           FinEvalId
+                        </TableCell>
+                        <TableCell align="left" sx={{ fontWeight: "bold" }}>
+                            CreditId
                         </TableCell>
                         <TableCell align="right" sx={{ fontWeight: "bold" }}>
                             Estado
                         </TableCell>
+                        <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                            Tipo de Credito
+                        </TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {requests.map((request) => (
+                    {requests.map((request, index) => (
                         <TableRow
-                            key={request.id}
+                            key={request.id || index}
                             sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                         >
-                            <TableCell align="left">{request.clientRut}</TableCell>
-                            <TableCell align="left">{request.type}</TableCell>
-                            <TableCell align="right">{request.status}</TableCell>
+                            <TableCell align="left">{request.finEval.userId ?request.finEval.userId : 'N/A'}</TableCell>
+                            <TableCell align="left">{request.finEval.finEvalId}</TableCell>
+                            <TableCell align="left">{request.credits ? request.credits.creditId : 'N/A'}</TableCell>
+                            <TableCell align="right">{request.finEval.status}</TableCell>
+                            <TableCell align="left">{request.credits ? request.credits.type : 'N/A'}</TableCell>
                             <TableCell>
                                 <Button
                                     variant="contained"
                                     color="info"
                                     size="small"
-                                    onClick={() => handleEdit(request.id)}
+                                    onClick={() => handleEdit(request.finEval.finEvalId)}
                                     style={{ marginLeft: "0.5rem" }}
                                     startIcon={<EditIcon />}
                                 >
@@ -118,12 +143,40 @@ const RequestList = () => {
                                     variant="contained"
                                     color="error"
                                     size="small"
-                                    onClick={() => handleDelete(request.id)}
+                                    onClick={() => handleDelete(request.finEval.finEvalId)}
                                     style={{ marginLeft: "0.5rem" }}
                                     startIcon={<DeleteIcon />}
                                 >
                                     Eliminar
                                 </Button>
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    size="small"
+                                    onClick={() => handleStatus(request.finEval.finEvalId)}
+                                    style={{ marginLeft: "0.5rem" }}
+                                    startIcon={<InfoIcon />}
+                                >
+                                    Status
+                                </Button>
+
+                                <Dialog
+                                    open={openDialog}
+                                    onClose={() => setOpenDialog(false)}
+                                    aria-labelledby="track-request-dialog"
+                                >
+                                    <DialogTitle>Detalles de Seguimiento</DialogTitle>
+                                    <DialogContent>
+                                        <DialogContentText>
+                                            {trackDetails}
+                                        </DialogContentText>
+                                    </DialogContent>
+                                    <DialogActions>
+                                        <Button onClick={() => setOpenDialog(false)} color="primary">
+                                            Cerrar
+                                        </Button>
+                                    </DialogActions>
+                                </Dialog>
                             </TableCell>
                         </TableRow>
                     ))}

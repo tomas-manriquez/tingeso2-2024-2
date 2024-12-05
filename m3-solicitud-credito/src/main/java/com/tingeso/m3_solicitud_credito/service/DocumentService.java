@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class DocumentService {
@@ -128,5 +130,64 @@ public class DocumentService {
         return documentRepository.save(document);
     }
 
+    /**
+     * Comprehensive method to save multiple documents with validation
+     *
+     * @param files MultipartFiles to save
+     * @param userId User ID (optional, can be null)
+     * @param finEvalId Financial Evaluation ID (optional, can be null)
+     * @return List of saved DocumentEntity objects
+     * @throws IOException If there's an error processing the files
+     */
+    public List<DocumentEntity> saveMultipleDocuments(
+            MultipartFile[] files,
+            Long userId,
+            Long finEvalId
+    ) throws IOException {
+        // Validate input
+        if (files == null || files.length == 0) {
+            throw new IllegalArgumentException("No files provided");
+        }
+
+        // Validate either userId or finEvalId is provided
+        if (userId == null && finEvalId == null) {
+            throw new IllegalArgumentException("Either userId or finEvalId must be provided");
+        }
+
+        List<DocumentEntity> savedDocuments = new ArrayList<>();
+
+        // Process and save each file
+        for (MultipartFile file : files) {
+            // Validate individual file
+            validateFile(file);
+
+            DocumentEntity document = new DocumentEntity();
+
+            // Set basic document properties
+            document.setName(file.getOriginalFilename());
+            document.setType(file.getContentType());
+
+            // Set either userId or finEvalId
+            if (userId != null) {
+                document.setUserId(userId);
+            } else {
+                document.setFinEvalId(finEvalId);
+            }
+
+            // Convert MultipartFile to byte array
+            document.setFile(file.getBytes());
+
+            // Save the document
+            DocumentEntity savedDocument = documentRepository.save(document);
+            savedDocuments.add(savedDocument);
+        }
+
+        return savedDocuments;
+    }
+
     public DocumentEntity findById(Long id) {return documentRepository.findById(id).orElse(null);}
+
+    public void deleteById(Long id) {documentRepository.deleteById(id); }
+
+    public List<DocumentEntity> findDocumentsByIdIn(List<Long> documentIds) {return documentRepository.findAllById(documentIds);}
 }

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/track-request")
-@CrossOrigin("*")
+//@CrossOrigin("*")
 public class TrackRequestController {
     @Autowired
     TrackRequestService trackRequestService;

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class UserRegisterService {
@@ -25,7 +26,7 @@ public class UserRegisterService {
 
             if(birthday.isBefore(LocalDate.now().minusYears(18)))
             {
-                if(client.getDocumentsIds().isEmpty())
+                if(client.getDocumentsIds().isEmpty() )
                 {
                     client.setStatus("espera");
                     userRegisterRepository.save(client);
@@ -49,4 +50,10 @@ public class UserRegisterService {
     }
 
     public UserEntity findById(Long id) {return userRegisterRepository.findById(id).orElse(null);}
+
+    public List<UserEntity> findAll() {return userRegisterRepository.findAll();}
+
+    public void delete(UserEntity user) { userRegisterRepository.delete(user);}
+
+    public UserEntity save(UserEntity user) {return userRegisterRepository.save(user);}
 }

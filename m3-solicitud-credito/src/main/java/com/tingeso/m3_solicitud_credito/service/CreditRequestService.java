@@ -1,6 +1,7 @@
 package com.tingeso.m3_solicitud_credito.service;
 
 import com.tingeso.m3_solicitud_credito.clients.UserFeignClient;
+import com.tingeso.m3_solicitud_credito.dto.CreditRequestWithCreditDTO;
 import com.tingeso.m3_solicitud_credito.entity.CreditEntity;
 import com.tingeso.m3_solicitud_credito.entity.FinEvalEntity;
 import com.tingeso.m3_solicitud_credito.model.User;
@@ -10,6 +11,8 @@ import com.tingeso.m3_solicitud_credito.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -92,5 +95,33 @@ public class CreditRequestService {
 
     public FinEvalEntity findById(Long id){return creditRequestRepository.findById(id).orElse(null);}
 
+    public List<FinEvalEntity> findAll(){return creditRequestRepository.findAll();}
+
     public FinEvalEntity save(FinEvalEntity requestNew){return creditRequestRepository.save(requestNew);}
+
+    public void deleteById(Long finEvalId){creditRequestRepository.deleteById(finEvalId);}
+
+    public List<CreditRequestWithCreditDTO> getAllCreditRequestsWithCredits() {
+        // Retrieve all FinEval entities
+        List<FinEvalEntity> finEvals = creditRequestRepository.findAll();
+
+        // Map each FinEval to a DTO with its associated Credits
+        return finEvals.stream()
+                .map(finEval -> {
+                    // Find credits associated with this FinEval
+                    CreditEntity credits = creditRepository.findByFinEvalId(finEval.getFinEvalId());
+                    return new CreditRequestWithCreditDTO(finEval, credits);
+                })
+                .collect(Collectors.toList());
+    }
+
+    public CreditRequestWithCreditDTO getCreditRequestWithCreditDTO(Long id) {
+        FinEvalEntity finEval = creditRequestRepository.findById(id).orElse(null);
+        if (finEval!= null)
+        {
+            CreditEntity credit = creditRepository.findByFinEvalId(finEval.getFinEvalId());
+            return new CreditRequestWithCreditDTO(finEval, credit);
+        }
+        else return null;
+    }
 }

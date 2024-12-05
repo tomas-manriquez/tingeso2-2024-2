@@ -7,6 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Sidemenu from "./SideMenu.jsx";
 import { useState } from "react";
+import {Link} from "react-router-dom";
 
 export default function Navbar() {
     const [open, setOpen] = useState(false);
@@ -33,7 +34,10 @@ export default function Navbar() {
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         PrestaBancoWeb: Sistema de Gestión Hipotecas
                     </Typography>
-                    <Button color="inherit">Registrar Cliente</Button>
+                    <Link to="/client/add">
+                        <Button color="inherit">Registrar Cliente</Button>
+                    </Link>
+
                 </Toolbar>
             </AppBar>
 

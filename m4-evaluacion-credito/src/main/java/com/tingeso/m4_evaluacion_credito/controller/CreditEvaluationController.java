@@ -6,9 +6,11 @@ import com.tingeso.m4_evaluacion_credito.service.CreditEvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/credit-eval")
-@CrossOrigin("*")
+//@CrossOrigin("*")
 public class CreditEvaluationController {
     @Autowired
     CreditEvaluationService creditEvaluationService;
@@ -26,4 +28,5 @@ public class CreditEvaluationController {
 
     @PostMapping("/{id}")
     public FinEval requestEvaluation(@RequestBody FinEval finEval,@PathVariable Long id) {return creditEvaluationService.requestEvaluation(finEval, id);}
+
 }

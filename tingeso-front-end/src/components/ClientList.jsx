@@ -11,7 +11,7 @@ import Button from "@mui/material/Button";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import clientService from "../services/client.service.js";
+import UserRegisterService from "../services/actual-registro-usuario.service.js";
 
 const ClientList = () => {
     const [clients, setClients] = useState([]);
@@ -19,8 +19,8 @@ const ClientList = () => {
     const navigate = useNavigate();
 
     const init = () => {
-        clientService
-            .getAll()
+        UserRegisterService
+            .findAll()
             .then((response) => {
                 console.log("Mostrando listado de todos los clientes.", response.data);
                 setClients(response.data);
@@ -37,14 +37,14 @@ const ClientList = () => {
         init();
     }, []);
 
-    const handleDelete = (id) => {
+    const handleDelete = (user) => {
         console.log("Printing id", id);
         const confirmDelete = window.confirm(
             "¿Esta seguro que desea borrar este cliente?"
         );
         if (confirmDelete) {
-            clientService
-                .remove(id)
+            UserRegisterService
+                .remove(user)
                 .then((response) => {
                     console.log("cliente ha sido eliminado.", response.data);
                     init();
@@ -82,53 +82,61 @@ const ClientList = () => {
             <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                 <TableHead>
                     <TableRow>
-                        <TableCell align="left" sx={{ fontWeight: "bold" }}>
-                            Rut
-                        </TableCell>
-                        <TableCell align="left" sx={{ fontWeight: "bold" }}>
-                            Nombre
-                        </TableCell>
-                        <TableCell align="left" sx={{ fontWeight: "bold" }}>
-                           Apellido
-                        </TableCell>
-                        <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                            Cumpleaños
-                        </TableCell>
-                        <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                            Estado
-                        </TableCell>
+                        <TableCell align="left" sx={{ fontWeight: "bold" }}>UserId</TableCell>
+                        <TableCell align="left" sx={{ fontWeight: "bold" }}>Rut</TableCell>
+                        <TableCell align="left" sx={{ fontWeight: "bold" }}>Nombre</TableCell>
+                        <TableCell align="left" sx={{ fontWeight: "bold" }}>Apellido</TableCell>
+                        <TableCell align="right" sx={{ fontWeight: "bold" }}>Cumpleaños</TableCell>
+                        <TableCell align="right" sx={{ fontWeight: "bold" }}>Estado</TableCell>
+                        <TableCell align="right" sx={{ fontWeight: "bold" }}>Documentos</TableCell>
+                        <TableCell align="right" sx={{ fontWeight: "bold" }}>Documentos Validos</TableCell>
+                        <TableCell align="right" sx={{ fontWeight: "bold" }}>Acciones</TableCell>
 
 
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {clients.map((client) => (
+                    {clients.map((client, index) => (
                         <TableRow
-                            key={client.id}
+                            key={client.id || index}
                             sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                         >
+                            <TableCell align="left">{client.userId}</TableCell>
                             <TableCell align="left">{client.rut}</TableCell>
                             <TableCell align="left">{client.firstName}</TableCell>
                             <TableCell align="right">{client.lastName}</TableCell>
                             <TableCell align="right">{client.birthday}</TableCell>
                             <TableCell align="right">{client.status}</TableCell>
+                            <TableCell align="right">
+                                {client.documents && client.documents.length > 0
+                                    ? client.documents.map((doc, index) => (
+                                        <div key={index}>
+                                            <Link to={`/documents/${doc.id}`} target="_blank">
+                                                {doc.name}
+                                            </Link>
+                                        </div>
+                                    ))
+                                    : "No documents"}
+                            </TableCell>
+                            <TableCell align="right">
+                                {client.hasValidDocuments ? "Sí" : "No"}
+                            </TableCell>
                             <TableCell>
                                 <Button
                                     variant="contained"
                                     color="info"
                                     size="small"
-                                    onClick={() => handleEdit(client.id)}
+                                    onClick={() => handleEdit(client.userId)}
                                     style={{ marginLeft: "0.5rem" }}
                                     startIcon={<EditIcon />}
                                 >
                                     Editar
                                 </Button>
-
                                 <Button
                                     variant="contained"
                                     color="error"
                                     size="small"
-                                    onClick={() => handleDelete(client.id)}
+                                    onClick={() => handleDelete(client.userId)}
                                     style={{ marginLeft: "0.5rem" }}
                                     startIcon={<DeleteIcon />}
                                 >

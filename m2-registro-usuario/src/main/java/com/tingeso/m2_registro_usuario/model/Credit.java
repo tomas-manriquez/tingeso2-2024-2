@@ -26,5 +26,4 @@ public class Credit {
     private Long requestedAmount;
     @ElementCollection
     private List<Float> totalFees;
-
 }

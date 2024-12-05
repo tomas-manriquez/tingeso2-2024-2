@@ -12,3 +12,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  servlet:
+    multipart:
+      max-file-size: 10MB   # Adjust as needed
+      max-request-size: 50MB # Total upload size for all files

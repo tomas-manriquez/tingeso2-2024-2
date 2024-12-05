@@ -53,7 +53,7 @@ export default function Sidemenu({ open, toggleDrawer }) {
                     </ListItemIcon>
                     <ListItemText primary="Simular Credito" />
                 </ListItemButton>
-                <ListItemButton onClick={() => navigate("/request/status")}>
+                <ListItemButton onClick={() => navigate("/request/list")}>
                     <ListItemIcon>
                         <AnalyticsIcon />
                     </ListItemIcon>

@@ -7,7 +7,6 @@ import ClientList from "./components/ClientList.jsx";
 import AddEditClient from "./components/AddEditClient.jsx";
 import RequestList from "./components/RequestList.jsx";
 import SimulateCredit from "./components/SimulateCredit.jsx";
-import RequestStatus from "./components/RequestStatus.jsx";
 import AddEditRequest from "./components/AddEditRequest.jsx";
 import TestComponent from "./components/TestComponent.jsx";
 
@@ -23,7 +22,6 @@ function App() {
                     <Route path="/client/edit/:id" element={<AddEditClient/>} />
                     <Route path="/request/list" element={<RequestList/>} />
                     <Route path="/request/calculate" element={<SimulateCredit/>} />
-                    <Route path="/request/status/:id" element={<RequestStatus/>} />
                     <Route path="/request/add" element={<AddEditRequest/>} />
                     <Route path="/request/edit/:id" element={<AddEditRequest/>} />
                     <Route path="/test" element={<TestComponent/>} />

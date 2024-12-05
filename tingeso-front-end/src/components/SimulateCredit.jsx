@@ -5,33 +5,49 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
-import requestService from "../services/request.service.js";
+import CreditSimulationService from "../services/m2-registro-usuario.service.js";
+import MenuItem from "@mui/material/MenuItem";
 
 const SimulateCredit= () => {
     const [clientRut, setClientRut] = useState("");
-    const [capital, setCapital] = useState("");
-    const [interesAnual, setInteresAnual] = useState("");
-    const [plazoPago, setPlazoPago] = useState("");
-    const [e, setResult] = useState(0);
+    const [credit, setCredit] = useState({
+        type: "",
+        maxPayTerm: "",
+        annualInterestRate: "",
+        maxFinanceAmount: "",
+        propertyValue: "",
+        requestedAmount: "",
+        clientRut: ""
+    });
+    const [simulationResult, setSimulationResult] = useState(null);
     const navigate = useNavigate();
+
+    const handleInputChange = (e) => {
+        const { id, value } = e.target;
+        setCredit(prevCredit => ({
+            ...prevCredit,
+            [id]: value
+        }));
+    };
 
     const simulateCredit = (e) => {
         e.preventDefault();
-        console.log('Solicitar simular credito.');
-        requestService
-            .simulate(clientRut, capital, interesAnual, plazoPago)
+        CreditSimulationService
+            .simulation(credit)
             .then((response) => {
                 console.log("simulacion aceptada", response.data);
-                //navigate("/paycheck/list");
+                setSimulationResult(response.data);
             })
             .catch((error) => {
                 console.log(
                     "Ha ocurrido un error al intentar calcular la simulacion: ",
                     error
                 );
+                setSimulationResult(null);
             });
         console.log("Fin calculo simulacion");
     };
+
 
     return (
         <Box
@@ -40,72 +56,100 @@ const SimulateCredit= () => {
             alignItems="center"
             justifyContent="center"
             component="form"
+            onSubmit={simulateCredit}
         >
-            <h3> Calcular Simulacion Credito </h3>
+            <h3>Calcular Simulacion Credito</h3>
             <hr />
-            <form>
-                <FormControl fullWidth>
-                    <TextField
-                        select
-                        id="clientRut"
-                        label="ClientRut"
-                        value={clientRut}
-                        variant="standard"
-                        onChange={(e) => setClientRut(e.target.value)}
-                    />
-                </FormControl>
 
-                <FormControl fullWidth>
-                    <TextField
-                        id="capital"
-                        label="Capital"
-                        value={capital}
-                        variant="standard"
-                        onChange={(e) => setCapital(e.target.value)}
-                    />
-                </FormControl>
+            <FormControl fullWidth>
+                <TextField
+                    select
+                    id="type"
+                    label="Tipo de Credito"
+                    value={credit.type}
+                    variant="standard"
+                    onChange={handleInputChange}
+                >
+                    <MenuItem value="vivienda1">Credito para 1ra Vivienda</MenuItem>
+                    <MenuItem value="vivienda2">Credito para 2da Vivienda</MenuItem>
+                    <MenuItem value="comercial">Credito para Propiedad Comercial</MenuItem>
+                    <MenuItem value="remodelacion">Credito para Remodelacion</MenuItem>
+                </TextField>
+            </FormControl>
 
-                <FormControl fullWidth>
-                    <TextField
-                        id="interesAnual"
-                        label="InteresAnual"
-                        value={interesAnual}
-                        variant="standard"
-                        onChange={(e) => setInteresAnual(e.target.value)}
-                    />
-                </FormControl>
+            <FormControl fullWidth>
+                <TextField
+                    id="maxPayTerm"
+                    label="Plazo Maximo (Años)"
+                    type="number"
+                    value={credit.maxPayTerm}
+                    variant="standard"
+                    onChange={handleInputChange}
+                />
+            </FormControl>
 
-                <FormControl fullWidth>
-                    <TextField
-                        id="plazoPago"
-                        label="PlazoPago"
-                        value={plazoPago}
-                        select
-                        variant="standard"
-                        defaultValue="1"
-                        onChange={(e) => setPlazoPago(e.target.value)}
-                        style={{ width: "25%" }}
-                    >
+            <FormControl fullWidth>
+                <TextField
+                    id="annualInterestRate"
+                    label="Tasa de Interes Anual (%)"
+                    type="number"
+                    value={credit.annualInterestRate}
+                    variant="standard"
+                    onChange={handleInputChange}
+                />
+            </FormControl>
 
-                    </TextField>
-                </FormControl>
+            <FormControl fullWidth>
+                <TextField
+                    id="maxFinanceAmount"
+                    label="Porcentaje Maximo Financiamiento"
+                    type="number"
+                    value={credit.maxFinanceAmount}
+                    variant="standard"
+                    onChange={handleInputChange}
+                />
+            </FormControl>
 
-                <FormControl>
-                    <br />
-                    <Button
-                        variant="contained"
-                        color="info"
-                        onClick={(e) => simulateCredit(e)}
-                        style={{ marginLeft: "0.5rem" }}
-                        startIcon={<CalculateIcon />}
-                    >
-                        Calcular Simulacion
-                    </Button>
-                </FormControl>
-            </form>
-            <div>
-                La cuota mensual del credito simulado es: {{e}}
-            </div>
+            <FormControl fullWidth>
+                <TextField
+                    id="propertyValue"
+                    label="Valor Propiedad (CLP)"
+                    type="number"
+                    value={credit.propertyValue}
+                    variant="standard"
+                    onChange={handleInputChange}
+                />
+            </FormControl>
+
+            <FormControl fullWidth>
+                <TextField
+                    id="requestedAmount"
+                    label="Monto Solicitado (CLP)"
+                    type="number"
+                    value={credit.requestedAmount}
+                    variant="standard"
+                    onChange={handleInputChange}
+                />
+            </FormControl>
+
+            <FormControl>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    color="info"
+                    style={{ marginTop: "1rem" }}
+                    startIcon={<CalculateIcon />}
+                >
+                    Calcular Simulacion
+                </Button>
+            </FormControl>
+
+            {simulationResult && (
+                <div style={{ marginTop: "1rem" }}>
+                    <h4>Resultado de Simulación</h4>
+                    <p>La cuota mensual del credito simulado es: {simulationResult}</p>
+                </div>
+            )}
         </Box>
     );
 };
