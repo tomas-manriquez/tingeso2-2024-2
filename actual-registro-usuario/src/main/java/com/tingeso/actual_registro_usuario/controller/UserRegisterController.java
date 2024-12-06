@@ -30,7 +30,7 @@ public class UserRegisterController {
     @GetMapping("/all")
     public List<UserEntity> findAll(){ return userRegisterService.findAll(); }
 
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public String delete(@RequestBody UserEntity user){ userRegisterService.delete(user); return "user deleted successfully"; }
 
     @PostMapping("/save")

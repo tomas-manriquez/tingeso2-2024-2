@@ -59,6 +59,8 @@ public class DocumentController {
             @RequestParam(required = false) Long finEvalId
     ) throws IOException {
         DocumentEntity savedDocument = documentService.saveDocument(file, userId, finEvalId);
+        if(userId !=null){
+        }
         return ResponseEntity.ok(savedDocument);
     }
 

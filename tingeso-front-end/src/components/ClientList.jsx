@@ -37,8 +37,12 @@ const ClientList = () => {
         init();
     }, []);
 
+    useEffect(() => {
+        console.log("Updated client state:", clients);
+    }, [clients]);
+
     const handleDelete = (user) => {
-        console.log("Printing id", id);
+        console.log("Updated client state:", user);
         const confirmDelete = window.confirm(
             "¿Esta seguro que desea borrar este cliente?"
         );
@@ -62,6 +66,8 @@ const ClientList = () => {
         console.log("Printing id", id);
         navigate(`/client/edit/${id}`);
     };
+
+
 
     return (
         <TableContainer component={Paper}>
@@ -136,7 +142,7 @@ const ClientList = () => {
                                     variant="contained"
                                     color="error"
                                     size="small"
-                                    onClick={() => handleDelete(client.userId)}
+                                    onClick={() => handleDelete(client)}
                                     style={{ marginLeft: "0.5rem" }}
                                     startIcon={<DeleteIcon />}
                                 >

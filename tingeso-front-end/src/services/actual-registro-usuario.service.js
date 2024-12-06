@@ -17,7 +17,7 @@ const findAll = () =>{
 }
 
 const remove = (user) =>{
-    return httpClient.post('register/delete', user);
+    return httpClient.delete('register/delete', {data: user});
 }
 
 const save = (user) =>{

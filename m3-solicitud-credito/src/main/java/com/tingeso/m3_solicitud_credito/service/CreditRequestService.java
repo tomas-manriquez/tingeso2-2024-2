@@ -7,7 +7,7 @@ import com.tingeso.m3_solicitud_credito.entity.FinEvalEntity;
 import com.tingeso.m3_solicitud_credito.model.User;
 import com.tingeso.m3_solicitud_credito.repository.CreditRepository;
 import com.tingeso.m3_solicitud_credito.repository.CreditRequestRepository;
-import com.tingeso.m3_solicitud_credito.repository.DocumentRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -123,5 +123,22 @@ public class CreditRequestService {
             return new CreditRequestWithCreditDTO(finEval, credit);
         }
         else return null;
+    }
+
+    public CreditRequestWithCreditDTO saveFinEvalWithCredits(CreditRequestWithCreditDTO finEvalWithCreditDTO) {
+        // Save the FinEval entity first
+        FinEvalEntity savedFinEval = creditRequestRepository.save(finEvalWithCreditDTO.getFinEval());
+
+        // Set the finEvalId for each Credit and save
+        if (finEvalWithCreditDTO.getCredits()!= null) {
+            CreditEntity credit = creditRepository.save(finEvalWithCreditDTO.getCredits());
+            return new CreditRequestWithCreditDTO(savedFinEval, credit);
+        }
+        // Return a new DTO with the saved entities
+        else{
+            CreditEntity credit = new CreditEntity();
+            credit.setFinEvalId(finEvalWithCreditDTO.getFinEval().getFinEvalId());
+            return new CreditRequestWithCreditDTO(savedFinEval, credit);
+        }
     }
 }

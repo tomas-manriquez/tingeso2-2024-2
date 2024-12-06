@@ -1,6 +1,8 @@
 package com.tingeso.m3_solicitud_credito.service;
 
+import com.tingeso.m3_solicitud_credito.clients.UserFeignClient;
 import com.tingeso.m3_solicitud_credito.entity.DocumentEntity;
+import com.tingeso.m3_solicitud_credito.model.User;
 import com.tingeso.m3_solicitud_credito.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ public class DocumentService {
 
     @Autowired
     private DocumentRepository documentRepository;
+    @Autowired
+    private UserFeignClient userFeignClient;
 
     /**
      * Save a document from a MultipartFile for a specific user
@@ -127,7 +131,24 @@ public class DocumentService {
         document.setFile(file.getBytes());
 
         // Save and return the document
-        return documentRepository.save(document);
+        DocumentEntity savedDoc = documentRepository.save(document);
+
+        if(userId != null) {
+            // Retrieve the user via Feign client
+            User user = userFeignClient.findById(userId);
+
+            // If documentsIds is null, initialize it
+            if (user.getDocumentsIds() == null) {
+                user.setDocumentsIds(new ArrayList<>());
+            }
+
+            // Add the new document ID to the list
+            user.getDocumentsIds().add(savedDoc.getId());
+
+            // Save the updated user via Feign client
+            userFeignClient.save(user);
+        }
+        return savedDoc;
     }
 
     /**

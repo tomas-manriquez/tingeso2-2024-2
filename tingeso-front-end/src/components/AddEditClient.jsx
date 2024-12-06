@@ -10,9 +10,11 @@ import SaveIcon from "@mui/icons-material/Save";
 import {Checkbox, FormControlLabel} from "@mui/material";
 import Box from "@mui/material/Box";
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Dialog, DialogTitle, DialogContent } from '@mui/material';
 
 const AddEditClient = () => {
     const [client, setClient] = useState({
+        userid: null,
         rut: "",
         firstName: "",
         lastName: "",
@@ -29,35 +31,71 @@ const AddEditClient = () => {
     const [titleClientForm, setTitleClientForm] = useState("Nuevo Cliente");
     const navigate = useNavigate();
     const [file, setFile] = useState(null);
+    const [previewDocument, setPreviewDocument] = useState(null);
+
+    const openDocumentPreview = (documentId) => {
+        creditRequestService.getDocument(documentId).then((response) => {
+            console.log('Response headers:', response.headers);
+            console.log('Response data:', response.data);
+            // Create a blob directly from the response data
+            const blob = new Blob([response.data], {
+                type: response.headers['content-type'] || 'application/octet-stream'
+            });
+
+            // Create a URL for the blob
+            const url = URL.createObjectURL(blob);
+            setPreviewDocument(url);
+        }).catch((error) => {
+            console.log("Error previewing the document.", error);
+            alert("Could not preview the document.");
+        });
+    };
+
+    // Add a cleanup to revoke the object URL when the component unmounts or preview closes
+    useEffect(() => {
+        return () => {
+            if (previewDocument) {
+                URL.revokeObjectURL(previewDocument);
+            }
+        };
+    }, [previewDocument]);
+
+    const closeDocumentPreview = () => {
+        setPreviewDocument(null);
+    };
+
 
     const saveClient = (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Prevent form submission
 
+        // Check if `id` is available (editing an existing client)
         if (id) {
-            //Update Client
+            // Update Client
+            const updatedClient = { ...client, id }; // Add `id` to the client object
             UserRegisterService
-                .save({...client, id})
+                .save(client) // Call the update service
                 .then((response) => {
-                    console.log("Cliente ha sido actualizado.", response.data);
-                    navigate("/client/list");
+                    console.log("Client has been updated successfully:", response.data);
+                    navigate("/client/list"); // Navigate back to the client list
                 })
                 .catch((error) => {
-                    console.log(
-                        "Ha ocurrido un error al intentar actualizar datos del cliente.",
+                    console.error(
+                        "An error occurred while updating the client:",
                         error
                     );
                 });
         } else {
-            //Create new client
+            // Create a New Client
+            const newClient = { ...client, id: null }; // Ensure `id` is null for new clients
             UserRegisterService
-                .register(client)
+                .register(newClient) // Call the register service
                 .then((response) => {
-                    console.log("Cliente ha sido añadido.", response.data);
-                    navigate("/client/list");
+                    console.log("Client has been added successfully:", response.data);
+                    navigate("/client/list"); // Navigate back to the client list
                 })
                 .catch((error) => {
-                    console.log(
-                        "Ha ocurrido un error al intentar crear nuevo cliente.",
+                    console.error(
+                        "An error occurred while creating a new client:",
                         error
                     );
                 });
@@ -72,11 +110,11 @@ const AddEditClient = () => {
         }));
     };
 
-    const uploadMultipleUserDocuments = async (files, userId) => {
+    const uploadMultipleUserDocuments = async (files) => {
         try {
             // Create an array to store document IDs
             const documentPromises = files.map(file =>
-                creditRequestService.uploadUserDocument(file, userId)
+                creditRequestService.uploadUserDocument(file, id)
             );
 
             // Wait for all uploads to complete
@@ -88,9 +126,10 @@ const AddEditClient = () => {
             // Update client's documentsIds
             setClient(client => ({
                 ...client,
-                documentsIds: [...client.documentsIds, ...documentIds]
+                documentsIds: [...(client.documentsIds || []), ...documentIds],
             }));
 
+            await UserRegisterService.save(client);
             return documentIds;
         } catch (error) {
             console.error("Error uploading multiple documents:", error);
@@ -167,19 +206,30 @@ const AddEditClient = () => {
     };
 
     const downloadDocument = (documentId) => {
-        creditRequestService.getDocument(documentId).then((response) => {
-            const blob = new Blob([response.data], { type: response.headers['content-type'] });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;    //link con el que interactua el usuario
-            link.setAttribute('download', response.headers['content-disposition'].split('filename=')[1].replace(/"/g, '')); //nombre de archivo
-            document.body.appendChild(link);    //cuerpo del archivo (el contenido)
-            link.click();
-            link.remove();
-        }).catch((error) => {
-            console.log("Error descargando el documento.", error);
-        });
+        creditRequestService.getDocument(documentId)
+            .then((response) => {
+                const blob = new Blob([response.data], { type: response.headers['content-type'] });
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+
+                // Extract filename or provide a fallback
+                const contentDisposition = response.headers['content-disposition'];
+                const fallbackFilename = "downloaded_document";
+                const filename = contentDisposition
+                    ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+                    : fallbackFilename;
+
+                link.setAttribute('download', filename);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            })
+            .catch((error) => {
+                console.log("Error descargando el documento.", error);
+            });
     };
+
 
     const deleteDocument = (documentId) => {
         if (window.confirm("Está seguro que quiere eliminar el documento?")) {
@@ -197,8 +247,9 @@ const AddEditClient = () => {
             console.error("User ID is missing. Unable to fetch documents.");
             return;
         }
+        console.log("Sending document IDs to backend:", client.documentsIds);
         try {
-            const response = await creditRequestService.getAllDocuments(id); // Pass user ID to the service method
+            const response = await creditRequestService.getAllDocuments(client.documentsIds); // Pass user ID to the service method
             const clientDocuments = response.data;
             setDocuments(clientDocuments);
         } catch (error) {
@@ -214,14 +265,16 @@ const AddEditClient = () => {
                 .then((response) => {
                     const clientData = response.data;
                     setClient({
+                        userId: clientData.userId || null,
                         rut: clientData.rut || "",
                         firstName: clientData.firstName || "",
                         lastName: clientData.lastName || "",
                         birthday: clientData.birthday || "",
                         status: clientData.status || "",
                         hasValidDocuments: clientData.hasValidDocuments ?? true,
-                        documents: clientData.documents || []
+                        documentsIds: clientData.documentsIds || [],
                     });
+                    // Fetch and update the documents state
                 })
                 .catch((error) => {
                     console.log("Se ha producido un error.", error);
@@ -229,7 +282,17 @@ const AddEditClient = () => {
         }
     }, [id]);
 
-    // Rest of the methods remain the same as in your original component
+    useEffect(() => {
+        if (client.documentsIds && client.documentsIds.length > 0) {
+            console.log("Fetching documents for client:", client.documentsIds);
+            fetchDocuments();
+        }
+    }, [client]); // Only runs when `client` changes
+
+    useEffect(() => {
+        console.log("Updated client state:", client);
+        console.log("document list: ",documents);
+    }, [client, documents]);
 
     return (
         <Box
@@ -382,12 +445,37 @@ const AddEditClient = () => {
                             <Button onClick={() => downloadDocument(doc.id)} >
                                 Descargar
                             </Button>
+                            <Button onClick={() => openDocumentPreview(doc.id)}>
+                                Vista Previa
+                            </Button>
                             <Button onClick={() => deleteDocument(doc.id)}  color="error">
                                 Eliminar
                             </Button>
                         </div>
                     )) : <p>No hay documentos disponibles.</p>}
                 </div>
+            {/* Document Preview Dialog */}
+            <Dialog
+                open={!!previewDocument}
+                onClose={() => {
+                    URL.revokeObjectURL(previewDocument);
+                    setPreviewDocument(null);
+                }}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogTitle>Vista Previa del Documento</DialogTitle>
+                <DialogContent>
+                    {previewDocument && (
+                        <iframe
+                            src={previewDocument}
+                            width="100%"
+                            height="500px"
+                            title="Document Preview"
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
 
                 <FormControl>
                     <br />

@@ -65,4 +65,12 @@ public class CreditRequestController {
         CreditRequestWithCreditDTO finEvals = creditRequestService.getCreditRequestWithCreditDTO(id);
         return ResponseEntity.ok(finEvals);
     }
+
+    @PostMapping("/save/w-creds")
+    public ResponseEntity<CreditRequestWithCreditDTO> createFinEvalWithCredits(
+            @RequestBody CreditRequestWithCreditDTO finEvalWithCreditDTO) {
+
+        CreditRequestWithCreditDTO savedFinEval = creditRequestService.saveFinEvalWithCredits(finEvalWithCreditDTO);
+        return ResponseEntity.ok(savedFinEval);
+    }
 }

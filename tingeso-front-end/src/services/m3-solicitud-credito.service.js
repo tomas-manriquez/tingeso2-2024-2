@@ -17,8 +17,12 @@ const findAll = () =>{
     return httpClient.get('credit-request/all');
 }
 
-const save = (credit) =>{
-    return httpClient.post('credit-request/save', credit);
+const saveFinEval = (finEval) =>{
+    return httpClient.post('credit-request/save', finEval);
+}
+
+const saveCredit = (credit) =>{
+    return httpClient.post('/credit-request/credit', credit);
 }
 
 const getAllCreditRequestsWithCredits = () =>{
@@ -27,6 +31,11 @@ const getAllCreditRequestsWithCredits = () =>{
 
 const getCreditRequestWithCreditDTO = (id) =>{
     return httpClient.get(`/credit-request/${id}/w-creds`);
+}
+
+//'save' method in backend
+const createFinEvalWithCredits = (dto) =>{
+    return httpClient.post("/credit-request/save/w-creds", dto);
 }
 
 //Document
@@ -86,11 +95,16 @@ const uploadMultipleFinancialEvaluationDocuments = async (files, finEvalId) => {
     Array.from(files).forEach((file) => {
         formData.append("files", file); // Use "files" as the key
     });
-    return httpClient.post(`/credit-request/doc/upload/multiple/${finEvalId}`, formData, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    });
+    try {
+        const response = await httpClient.post(`/credit-request/doc/upload/multiple/${finEvalId}`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+        return response.data; // Return response data
+    } catch (error) {
+        throw error; // Handle errors appropriately
+    }
 };
 
 const uploadMultipleUserDocuments = async (files, userId) => {
@@ -114,7 +128,9 @@ const uploadMultipleUserDocuments = async (files, userId) => {
 };
 
 const getDocument = (finEvalId) =>{
-    return httpClient.get(`/credit-request/doc/${finEvalId}`);
+    return httpClient.get(`/credit-request/doc/${finEvalId}`, {
+        responseType:"blob",
+    });
 }
 
 const deleteDocument = (docId) =>{
@@ -125,6 +141,7 @@ const getAllDocuments = (documentIds) =>{
     return httpClient.post('credit-request/doc/bulk-retrieve', documentIds);
 }
 
-export default {example, makeRequest, findById, findAll, save, getAllCreditRequestsWithCredits, getCreditRequestWithCreditDTO,
+export default {example, makeRequest, findById, findAll, saveFinEval, saveCredit,
+    getAllCreditRequestsWithCredits, getCreditRequestWithCreditDTO, createFinEvalWithCredits,
     uploadFinancialEvaluationDocument, uploadDocument, uploadMultipleFinancialEvaluationDocuments,
     uploadMultipleUserDocuments,getDocument, deleteDocument, getAllDocuments, uploadUserDocument};
