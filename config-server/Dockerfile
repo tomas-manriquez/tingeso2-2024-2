@@ -2,7 +2,7 @@
 FROM openjdk:17
 
 #Pasar .jar de disco a la imagen
-ARG JAR_FILE=target/config-server-0.0.1-SNAPSJOT.jar
+ARG JAR_FILE=target/config-server-0.0.1-SNAPSHOT.jar
 COPY ${JAR_FILE} config-server.jar
 
 #Pasar instruccion para correr el ejecutable, lo mismo que cualquier .jar
