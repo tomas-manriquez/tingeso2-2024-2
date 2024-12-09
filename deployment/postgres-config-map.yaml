@@ -16,9 +16,11 @@ data:
   #m3-solicitud-credito
   DB_HOST_M3: db-m3-service
   DB_PORT_M3: "5432"
-  DB_DBNAME_M3: db-m2
+  DB_DBNAME_M3: db-m3
   #m4-evaluacion-credito
-
+  DB_HOST_M4: db-m4-service
+  DB_PORT_M4: "5432"
+  DB_DBNAME_M4: db-m4
   #m5-seguimiento-solicitud
 
   #m6-calculo-costos-totales
