@@ -6,7 +6,7 @@ metadata:
     app: postgres-config-map
 data:
   #actual-registro-usuario
-  DB_HOST_ACTUAL: actual-registro-usuario-service
+  DB_HOST_ACTUAL: db-actual-registro-usuario-service
   DB_PORT_ACTUAL: "5432"
   DB_DBNAME_ACTUAL: db-actual-registro-usuario
   #m2-registro-usuario

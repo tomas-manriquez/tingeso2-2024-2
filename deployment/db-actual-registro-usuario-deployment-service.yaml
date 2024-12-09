@@ -11,7 +11,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/data/orders-db-data"
+    path: "/data/db-actual-registro-usuario-data"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -33,7 +33,7 @@ kind: Deployment
 metadata:
   name: db-actual-registro-usuario-deployment
   labels:
-    app: orders-db-deployment
+    app: db-actual-registro-usuario-deployment
     tier: database
 spec:
   selector:
@@ -57,20 +57,20 @@ spec:
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: postgres-credentials
-                  key: DB_USER_ORDERS
+                  name: postgres-secrets
+                  key: DB_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-credentials
-                  key: DB_PASSWORD_ORDERS
+                  name: postgres-secrets
+                  key: DB_PASSWORD
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
-              name: orders-db-data
+              name: db-actual-registro-usuario-data
       volumes:
         - name: db-actual-registro-usuario-data
           persistentVolumeClaim:
-            claimName: orders-db-pvc
+            claimName: db-actual-registro-usuario-pvc
 ---
 apiVersion: v1
 kind: Service
