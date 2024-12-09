@@ -7,9 +7,9 @@ eureka:
     register-with-eureka: true
     service-url:
       defaultZone: http://eureka-server-service:8761/eureka
-  #instance:
+  instance:
     #hostname: eureka-server-service
-    #preferIpAddress: true
+    preferIpAddress: true
 
 spring:
   cloud:
@@ -30,7 +30,7 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
       routes:
-        - id: m2-registro-usuario-deployment
+        - id: m2-registro-usuario
           uri: lb://m2-registro-usuario
           predicates:
             - Path=/simulation/**
