@@ -22,5 +22,7 @@ data:
   DB_PORT_M4: "5432"
   DB_DBNAME_M4: db-m4
   #m5-seguimiento-solicitud
-
+  DB_HOST_M5: db-m5-service
+  DB_PORT_M5: "5432"
+  DB_DBNAME_M5: db-m5
   #m6-calculo-costos-totales

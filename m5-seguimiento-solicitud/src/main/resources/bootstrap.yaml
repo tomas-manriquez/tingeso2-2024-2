@@ -4,9 +4,9 @@ spring:
   cloud:
     config:
       enabled: true
-      uri: http://localhost:8888
+      uri: http://config-server-service:8888
   config:
-    import: configserver:http://localhost:8888
+    import: configserver:http://config-server-service:8888
   datasource:
     #para local
     #DB_HOST = localhost
