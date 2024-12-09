@@ -47,14 +47,3 @@ spec:
                 secretKeyRef:
                   name: postgres-secrets
                   key: DB_PASSWORD
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: m2-registro-usuario-service
-  labels:
-    app: m2-registro-usuario-service
-spec:
-  selector:
-    app: m2-registro-usuario-deployment #TODO verificar que es correcto referenciar a deployment
-  #TODO agregar 'ports' si es que se cae
