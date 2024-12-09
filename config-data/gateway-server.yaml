@@ -13,6 +13,9 @@ eureka:
 
 spring:
   cloud:
+    #kubernetes:
+      #discovery:
+        #all-namespaces: true
     gateway:
       discovery:
         locator:
@@ -27,7 +30,7 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
       routes:
-        - id: m2-registro-usuario-**
+        - id: m2-registro-usuario-deployment
           uri: lb://m2-registro-usuario
           predicates:
             - Path=/simulation/**
