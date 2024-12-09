@@ -6,15 +6,13 @@ metadata:
     app: postgres-config-map
 data:
   #actual-registro-usuario
-  #DB_HOST_ACTUAL:
-  #DB_PORT_ACTUAL: "5432"
-  #DB_DBNAME_ACTUAL: db-actual-registro-usuario
+  DB_HOST_ACTUAL: actual-registro-usuario-service
+  DB_PORT_ACTUAL: "5432"
+  DB_DBNAME_ACTUAL: db-actual-registro-usuario
   #m2-registro-usuario
   DB_HOST_M2: db-m2-service
   DB_PORT_M2: "5432"
   DB_DBNAME_M2: db-m2
-  DB_USER_M2: "postgres"
-  DB_PASSWORD_M2: "admin"
   #m3-solicitud-credito
 
   #m4-evaluacion-credito
