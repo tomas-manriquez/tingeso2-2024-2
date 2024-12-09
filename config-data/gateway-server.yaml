@@ -27,8 +27,7 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
       routes:
-          #TODO 6 rutas para cada microservicio
-        - id: m2-registro-usuario
+        - id: m2-registro-usuario-**
           uri: lb://m2-registro-usuario
           predicates:
             - Path=/simulation/**
