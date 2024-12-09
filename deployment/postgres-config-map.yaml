@@ -26,3 +26,6 @@ data:
   DB_PORT_M5: "5432"
   DB_DBNAME_M5: db-m5
   #m6-calculo-costos-totales
+  DB_HOST_M6: db-m6-service
+  DB_PORT_M6: "5432"
+  DB_DBNAME_M6: db-m6
