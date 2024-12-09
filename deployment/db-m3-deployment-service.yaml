@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: db-m3-pv
+  labels:
+    type: local
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data/db-m3-data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-m3-pvc
+  labels:
+    app: postgres
+    tier: database
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-m3-deployment
+  labels:
+    app: db-m3-deployment
+    tier: database
+spec:
+  selector:
+    matchLabels:
+      app: db-m3-deployment
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: db-m3-deployment
+        tier: database
+    spec:
+      containers:
+        - name: db-m3
+          image: postgres
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: DB_PASSWORD
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: db-m3-data
+      volumes:
+        - name: db-m3-data
+          persistentVolumeClaim:
+            claimName: db-m3-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-m3-service
+  labels:
+    app: db-m3-service
+    tier: database
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+  selector:
+    app: db-m3-deployment
+    tier: database
+  type: LoadBalancer
