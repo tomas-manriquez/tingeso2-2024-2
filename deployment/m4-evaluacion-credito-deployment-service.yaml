@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: m4-evaluacion-credito-deployment #nombre del pod
+  labels:
+    app: m4-evaluacion-credito-deployment
+spec:
+  selector:
+    matchLabels:
+      app: m4-evaluacion-credito-deployment  #los 3 usan este nombre
+  replicas: 1                              #existen 3 pods como replicas, para la Evaluacion puede ser 1
+  template:
+    metadata:
+      labels:
+        app: m4-evaluacion-credito-deployment
+    spec:
+      containers:
+        - name: m4-evaluacion-credito-deployment
+          image: tomasmanriquez480/m4-evaluacion-credito:latest
+          ports:
+            - containerPort: 8092
+          env:
+            - name: SERVER_PORT
+              value: "0"
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config-map
+                  key: DB_HOST_M4
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config-map
+                  key: DB_PORT_M4
+            - name: DB_DBNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config-map
+                  key: DB_DBNAME_M4
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: DB_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: m4-evaluacion-credito-service
+  labels:
+    app: m4-evaluacion-credito-service
+spec:
+  selector:
+    app: m4-evaluacion-credito-deployment
+  ports:
+    - protocol: TCP
+      port: 8092
+      targetPort: 8092
+  type: ClusterIP
