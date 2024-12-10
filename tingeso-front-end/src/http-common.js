@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const tingesoBackendServer = import.meta.env.VITE_PAYROLL_BACKEND_SERVER;
-const tingesoBackendPort = import.meta.env.VITE_PAYROLL_BACKEND_PORT;
+const tingesoBackendServer = VITE_PAYROLL_BACKEND_SERVER//import.meta.env.VITE_PAYROLL_BACKEND_SERVER;
+const tingesoBackendPort = VITE_PAYROLL_BACKEND_PORT//import.meta.env.VITE_PAYROLL_BACKEND_PORT;
 
 console.log(tingesoBackendServer)
 console.log(tingesoBackendPort)

@@ -1,13 +1,21 @@
-#Descargar la imagen de nginx
+# Use a multi-stage build for optimization
+FROM node:18-alpine as build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Production stage
 FROM nginx:stable-alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx/frontend.conf /etc/nginx/conf.d/frontend.conf
 
-#Buscar ejecutable de produccion en el disco duro local
-COPY /dist usr/share/nginx/html
-#COPY /nginx /etc/nginx/conf.d
-COPY /nginx/frontend.conf /etc/nginx/conf.d/
+# Expose standard HTTP port
+EXPOSE 80
 
-#Exponer puerto 3000
-EXPOSE 3000
-
-#Pasar comando para correr el ejecutable
+# Run nginx
 CMD ["nginx", "-g", "daemon off;"]
+
+
+
