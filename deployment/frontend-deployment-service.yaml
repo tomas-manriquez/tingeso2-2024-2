@@ -17,7 +17,7 @@ spec:
       containers:
         - name: frontend-deployment
           image: tomasmanriquez480/tingeso-frontend:latest
-          imagePullPolicy: "IfNotPresent"
+          imagePullPolicy: "Always"
           ports:
             - containerPort: 80
           env:
