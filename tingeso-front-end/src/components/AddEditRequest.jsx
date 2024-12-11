@@ -1,141 +1,222 @@
-import { useState, useEffect } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
-import CreditRequestService from "../services/m3-solicitud-credito.service.js";
-import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import FormControl from "@mui/material/FormControl";
-import MenuItem from "@mui/material/MenuItem";
-import SaveIcon from "@mui/icons-material/Save";
-import {Checkbox, FormControlLabel, InputLabel, Select} from "@mui/material";
-import IconButton from "@mui/material/IconButton";
-import creditsRequestService from "../services/m3-solicitud-credito.service.js";
+import React, { useState, useEffect } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import {
+    Box,
+    FormControl,
+    TextField,
+    Button,
+    MenuItem,
+    Checkbox,
+    FormControlLabel, Dialog, DialogTitle, DialogContent
+} from '@mui/material';
+import SaveIcon from '@mui/icons-material/Save';
+
+// Placeholder service - you'll need to create this
+import FinEvalService from '../services/m3-solicitud-credito.service.js';
+import CreditRequestService from '../services/m3-solicitud-credito.service.js';
+import Typography from "@mui/material/Typography";
+import DeleteIcon from "@mui/icons-material/Delete";
 import UserRegisterService from "../services/actual-registro-usuario.service.js";
 
-const AddEditRequest = () => {
-    const [finEval, setFinEval] = useState({
-        finEvaId:null,
-        userId:null,
-        status:'',
-        documentsIds: [],
-        hasSufficientDocuments:false,
-        monthlyCreditFee:0,
-        monthlyClientIncome:0,
-        hasGoodCreditHistory:false,
-        currentJobAntiquity:0,
-        isSelfEmployed:false,
-        hasGoodIncomeHistory:false,
-        monthlyDebt:0,
-        bankAccountBalance:0,
-        biggestWithdrawalInLastYear:0,
-        bankAccountAge:0,
-        biggestWithdrawalInLastSemester:0
-    });
-    const [credits, setCredit] = useState({
-        creditsId:null,
-        finEvalId:null,
-        type:'',
-        maxPayTerm:0,
-        annualInterestRate:0.0,
-        maxFinanceAmount:0,
-        propertyValue:0,
-        requestedAmount:0,
-        totalFees:[]
-    });
-    const [request, setRequest] = useState({
-        finEval:{
-            finEvaId:null,
-            userId:null,
-            status:'E1',
-            documentsIds: [],
-            hasSufficientDocuments:false,
-            monthlyCreditFee:0,
-            monthlyClientIncome:0,
-            hasGoodCreditHistory:false,
-            currentJobAntiquity:0,
-            isSelfEmployed:false,
-            hasGoodIncomeHistory:false,
-            monthlyDebt:0,
-            bankAccountBalance:0,
-            biggestWithdrawalInLastYear:0,
-            bankAccountAge:0,
-            biggestWithdrawalInLastSemester:0
-        },
-        credits:{
-            creditsId:null,
-            finEvalId:null,
-            type:'',
-            maxPayTerm:0,
-            annualInterestRate:0.0,
-            maxFinanceAmount:0,
-            propertyValue:0,
-            requestedAmount:0,
-            totalFees:[]
-        },
-    });
-    const [extraFees, setExtraFees] = useState([]);
-    const [documents, setDocuments] = useState([]);
-    const [newDocument, setNewDocument] = useState(null);
+const AddEditFinEval = () => {
     const { id } = useParams();
-    const [titleRequestForm, setTitleRequestForm] = useState("");
+    const [finEval, setFinEval] = useState({
+        finEvalId: id,
+        userId: null,
+        status: '',
+        documentsIds: [],
+        hasSufficientDocuments: false,
+        monthlyCreditFee: null,
+        monthlyClientIncome: null,
+        hasGoodCreditHistory: false,
+        currentJobAntiquity: null,
+        isSelfEmployed: false,
+        hasGoodIncomeHistory: false,
+        monthlyDebt: null,
+        bankAccountBalance: null,
+        biggestWithdrawalInLastYear: null,
+        totalDepositsInLastYear: null,
+        bankAccountAge: null,
+        biggestWithdrawalInLastSemester: null
+    });
+    const[credit, setCredit] = useState({
+        creditId: null,
+        finEvalId: finEval.finEvalId,
+        type: "propiedad1",
+        maxPayTerm: null,
+        annualInterestRate: null,
+        maxFinanceAmount: null,
+        propertyValue: null,
+        requestedAmount: null,
+        totalFees: []
+    })
+    const [documents, setDocuments] = useState([]);
+    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [filePreview, setFilePreview] = useState([]);
+    const [previewDocument, setPreviewDocument] = useState(null);
+
     const navigate = useNavigate();
+    const [titleFinEvalForm, setTitleFinEvalForm] = useState("Nueva Evaluación Financiera");
 
-    const saveRequest= (e) => {
-        e.preventDefault(); // Prevent form submission
+    // Handle input changes for form fields
+    const handleInputChange = (e) => {
+        const { name, id, value, type, checked } = e.target;
 
-        // Check if `id` is available (editing an existing client)
-        if (id) {
-            // Update Client
-            CreditRequestService
-                .createFinEvalWithCredits(request) // Call the update service
-                .then((response) => {
-                    console.log("Request + credits has been updated successfully:", response.data);
-                    navigate("/request/list"); // Navigate back to the client list
-                })
-                .catch((error) => {
-                    console.error(
-                        "An error occurred while updating the client:",
-                        error
-                    );
-                });
-        } else {
-            // Create a New Client
-            const newClient = { ...request, id: null }; // Ensure `id` is null for new clients
-            CreditRequestService
-                .createFinEvalWithCredits(newClient) // Call the register service
-                .then((response) => {
-                    console.log("Request + credits has been added successfully:", response.data);
-                    navigate("/request/list"); // Navigate back to the client list
-                })
-                .catch((error) => {
-                    console.error(
-                        "An error occurred while creating a new Request + credits:",
-                        error
-                    );
-                });
+        // Use name or id to determine which field is being changed
+        const fieldName = name || id;
+
+        setFinEval(prevFinEval => ({
+            ...prevFinEval,
+            [fieldName]: type === 'checkbox' ? checked :
+                type === 'number' ? value : ''
+        }));
+
+    };
+
+    const handleCreditInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+
+        setCredit(prevCredit => ({
+            ...prevCredit,
+            [name]: type === 'checkbox' ? checked :
+                type === 'number' ? (
+                    value === '' ? null :
+                        name === 'annualInterestRate' ? parseFloat(value) :
+                            Number(value)
+                ) : value
+        }));
+    };
+
+    // Add a new fee to the list
+    const addFee = (fee) => {
+        setCredit(prevCredit => ({
+            ...prevCredit,
+            totalFees: [...prevCredit.totalFees, Number(fee)]
+        }));
+    };
+
+// Remove a fee by its index
+    const removeFee = (indexToRemove) => {
+        setCredit(prevCredit => ({
+            ...prevCredit,
+            totalFees: prevCredit.totalFees.filter((_, index) => index !== indexToRemove)
+        }));
+    };
+
+// Update a specific fee by its index
+    const updateFee = (index, newValue) => {
+        setCredit(prevCredit => {
+            const updatedFees = [...prevCredit.totalFees];
+            updatedFees[index] = Number(newValue);
+            return {
+                ...prevCredit,
+                totalFees: updatedFees
+            };
+        });
+    };
+
+// Render method to show and modify fees
+    const renderFeesInput = () => {
+        return (
+            <Box>
+                <Typography variant="h6">Total Fees</Typography>
+                {credit.totalFees.map((fee, index) => (
+                    <Box key={index} display="flex" alignItems="center" mb={2}>
+                        <TextField
+                            type="number"
+                            label={`Fee ${index + 1}`}
+                            value={fee}
+                            onChange={(e) => updateFee(index, e.target.value)}
+                            variant="standard"
+                            fullWidth
+                        />
+                        <Button
+                            color="secondary"
+                            onClick={() => removeFee(index)}
+                        >
+                            Remove
+                        </Button>
+                    </Box>
+                ))}
+                <Button
+                    variant="contained"
+                    onClick={() => addFee(0)}
+                    color="primary"
+                >
+                    Add Fee
+                </Button>
+            </Box>
+        );
+    };
+
+    // Save or update financial evaluation
+    const saveFinEval = async (e) => {
+        e.preventDefault();
+
+        // Prepare the credit object with the linked finEvalId
+        const updatedCredit = {
+            ...credit,
+            finEvalId: finEval.finEvalId, // Ensure the link between finEval and credit
+        };
+
+        const request = {
+            finEval: finEval,
+            credits: updatedCredit, // Use the updated credit object
+        };
+
+        try {
+            if (!finEval.finEvalId || !credit.finEvalId || finEval.finEvalId !== credit.finEvalId) {
+                // Create a new financial evaluation + credit object
+                const response = await FinEvalService.createFinEvalWithCredits(request);
+                console.log("Financial Evaluation + Credit created successfully:", response.data);
+            } else {
+                // Update existing financial evaluation + credit object
+                const response = await FinEvalService.createFinEvalWithCredits(request);
+                console.log("Financial Evaluation + Credit updated successfully:", response.data);
+            }
+            navigate("/request/list");
+        } catch (error) {
+            console.error("Error saving financial evaluation:", error);
+            alert("An error occurred while saving the financial evaluation. Please try again.");
         }
     };
 
-    const uploadMultipleFinancialEvaluationDocuments = async (files) => {
+
+    //DOCUMENT
+    // Document-related functions (copied from AddEditClient)
+    const uploadMultipleUserDocuments = async (files) => {
         try {
-            // Create an array to store document IDs
+            // Ensure finEvalId exists before uploading
+            if (!finEval.finEvalId) {
+                alert("Please save the financial evaluation first before uploading documents.");
+                return [];
+            }
+
+            // Upload each file and collect their IDs
             const documentPromises = files.map(file =>
-                creditsRequestService.uploadUserDocument(file, id)
+                CreditRequestService.uploadFinancialEvaluationDocument(file, finEval.finEvalId)
             );
 
-            // Wait for all uploads to complete
             const uploadedDocuments = await Promise.all(documentPromises);
+            console.log("Raw uploaded documents:", uploadedDocuments);
+            const documentIds = uploadedDocuments.map(doc => doc.data.id);
 
-            // Extract document IDs from the upload responses
-            const documentIds = uploadedDocuments.map(doc => doc.id);
+            // Merge new document IDs with the existing ones
+            const updatedDocumentsIds = [...(finEval.documentsIds || []), ...documentIds];
 
-            // Update client's documentsIds
-            setClient(client => ({
-                ...client,
-                documentsIds: [...(client.documentsIds || []), ...documentIds],
+            // Update finEval state asynchronously
+            setFinEval(prevFinEval => ({
+                ...prevFinEval,
+                documentsIds: updatedDocumentsIds,
             }));
 
-            await UserRegisterService.save(client);
+            // Save finEval with updated state
+            await FinEvalService.saveFinEval({
+                ...finEval,
+                documentsIds: updatedDocumentsIds,
+            });
+
+
             return documentIds;
         } catch (error) {
             console.error("Error uploading multiple documents:", error);
@@ -144,13 +225,11 @@ const AddEditRequest = () => {
         }
     };
 
+    // Handle file selection for preview and upload
     const handleFileSelect = (e) => {
         const files = Array.from(e.target.files);
-
-        // Update selected files
         setSelectedFiles(files);
 
-        // Create file previews
         const previews = files.map(file => ({
             name: file.name,
             size: file.size,
@@ -160,48 +239,18 @@ const AddEditRequest = () => {
         setFilePreview(previews);
     };
 
-    const removeFilePreview = (index) => {
-        // Remove file from selected files and previews
-        const updatedFiles = selectedFiles.filter((_, i) => i !== index);
-        const updatedPreviews = filePreview.filter((_, i) => i !== index);
-
-        setSelectedFiles(updatedFiles);
-        setFilePreview(updatedPreviews);
-    };
-
-    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB per file
-    const validateFiles = (files) => {
-        for (const file of files) {
-            if (file.size > MAX_FILE_SIZE) {
-                return `File ${file.name} is too large. Max file size is 10MB.`;
-            }
-        }
-        return null; // No errors
-    };
+    // Trigger document upload
     const handleUploadDocuments = async () => {
-        const errorMessage = validateFiles(selectedFiles);
-        if (errorMessage) {
-            alert(errorMessage); // Display error to the user
-            return;
-        }
-        if (!id) {
-            alert("Please save the client first before uploading documents.");
-            return;
-        }
-
         if (selectedFiles.length === 0) {
             alert("Please select files to upload.");
             return;
         }
 
         try {
-            // Upload documents and get their IDs
-            await uploadMultipleFinancialEvaluationDocuments(selectedFiles, id);
-
-            // Refresh documents list
+            await uploadMultipleUserDocuments(selectedFiles);
             await fetchDocuments();
 
-            // Clear file selection
+            // Clear selected files and previews
             setSelectedFiles([]);
             setFilePreview([]);
 
@@ -211,15 +260,60 @@ const AddEditRequest = () => {
         }
     };
 
+
+    const fetchDocuments = async () => {
+        if (!id) {
+            console.error("Financial Evaluation ID is missing. Unable to fetch documents.");
+            return;
+        }
+
+        // Check if documentsIds exists and is not empty
+        if (!finEval.documentsIds || finEval.documentsIds.length === 0) {
+            console.log("No documents to fetch.");
+            setDocuments([]);
+            return;
+        }
+
+        try {
+            // Ensure you're passing the documentIds array correctly
+            const response = await CreditRequestService.getAllDocuments(finEval.documentsIds);
+
+            // Log the response to understand its structure
+            console.log("Document fetch response:", response);
+
+            // Adjust based on the actual response structure
+            setDocuments(response.data || response);
+        } catch (error) {
+            console.error("Error fetching documents:", error);
+            setDocuments([]); // Ensure documents state is cleared on error
+        }
+    };
+
+    // Preview a document
+    const openDocumentPreview = (documentId) => {
+        CreditRequestService.getDocument(documentId)
+            .then((response) => {
+                const blob = new Blob([response.data], {
+                    type: response.headers['content-type'] || 'application/octet-stream'
+                });
+                const url = URL.createObjectURL(blob);
+                setPreviewDocument(url);
+            })
+            .catch((error) => {
+                console.log("Error previewing the document.", error);
+                alert("Could not preview the document.");
+            });
+    };
+
+    // Download a document
     const downloadDocument = (documentId) => {
-        creditsRequestService.getDocument(documentId)
+        CreditRequestService.getDocument(documentId)
             .then((response) => {
                 const blob = new Blob([response.data], { type: response.headers['content-type'] });
                 const url = window.URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
 
-                // Extract filename or provide a fallback
                 const contentDisposition = response.headers['content-disposition'];
                 const fallbackFilename = "downloaded_document";
                 const filename = contentDisposition
@@ -232,76 +326,118 @@ const AddEditRequest = () => {
                 link.remove();
             })
             .catch((error) => {
-                console.log("Error descargando el documento.", error);
+                console.log("Error downloading the document.", error);
             });
     };
 
-
+    // Delete a document
     const deleteDocument = (documentId) => {
-        if (window.confirm("Está seguro que quiere eliminar el documento?")) {
-            creditsRequestService.remove(documentId).then(() => {
-                console.log("Documento eliminado.");
-                fetchDocuments(); //Actualizar lista de documentos
-            }).catch((error) => {
-                console.log("Error eliminando el documento.", error);
-            });
+        if (window.confirm("Are you sure you want to delete this document?")) {
+            CreditRequestService.remove(documentId)
+                .then(() => {
+                    // Remove the document ID from finEval
+                    setFinEval(prevFinEval => ({
+                        ...prevFinEval,
+                        documentsIds: prevFinEval.documentsIds.filter(id => id !== documentId)
+                    }));
+                    fetchDocuments();
+                })
+                .catch((error) => {
+                    console.log("Error deleting the document.", error);
+                });
         }
     };
 
-    const fetchDocuments = async () => {
-        if (!id) {
-            console.error("User ID is missing. Unable to fetch documents.");
-            return;
-        }
-        console.log("Sending document IDs to backend:", finEval.documentsIds);
-        try {
-            const response = await creditsRequestService.getAllDocuments(finEval.documentsIds); // Pass user ID to the service method
-            const clientDocuments = response.data;
-            setDocuments(clientDocuments);
-        } catch (error) {
-            console.log("Error fetching documents:", error);
-        }
+    // Render method to show document upload and list
+    const renderDocumentUpload = () => {
+        return (
+            <Box>
+                <input
+                    type="file"
+                    multiple
+                    onChange={handleFileSelect}
+                />
+                {filePreview.length > 0 && (
+                    <Box>
+                        <Typography>Selected Files:</Typography>
+                        {filePreview.map((file, index) => (
+                            <Typography key={index}>
+                                {file.name} - {file.size} bytes
+                            </Typography>
+                        ))}
+                        <Button
+                            variant="contained"
+                            onClick={handleUploadDocuments}
+                        >
+                            Upload Documents
+                        </Button>
+                    </Box>
+                )}
+
+                {documents.length > 0 && (
+                    <Box>
+                        <Typography variant="h6">Uploaded Documents</Typography>
+                        {documents.map((doc) => (
+                            <Box key={doc.id}>
+                                <Typography>{doc.name}</Typography>
+                                <Button onClick={() => openDocumentPreview(doc.id)}>
+                                    Preview
+                                </Button>
+                                <Button onClick={() => downloadDocument(doc.id)}>
+                                    Download
+                                </Button>
+                                <Button onClick={() => deleteDocument(doc.id)}>
+                                    Delete
+                                </Button>
+                            </Box>
+                        ))}
+                    </Box>
+                )}
+
+                {previewDocument && (
+                    <Dialog open={!!previewDocument} onClose={() => setPreviewDocument(null)}>
+                        <DialogContent>
+                            <iframe
+                                src={previewDocument}
+                                width="100%"
+                                height="500px"
+                            />
+                        </DialogContent>
+                    </Dialog>
+                )}
+            </Box>
+        );
     };
+    //DOCUMENT
 
-    const addExtraFee = () => {
-        setExtraFees([...extraFees, 0]); //agrega valor inicializado a 0
-    };
-
-    const removeExtraFee = (index) => {
-        setExtraFees(extraFees.filter((_, i) => i !== index)); //borra en indice dado
-    };
-
-    const handleExtraFeeChange = (index, value) => {
-        const updatedFees = [...extraFees];
-        updatedFees[index] = parseFloat(value);
-        setExtraFees(updatedFees);
-    };
-
-
-    const init = () => {
+    // Fetch existing financial evaluation when editing
+    useEffect(() => {
         if (id) {
-            setTitleRequestForm("Editar Solicitud");
-            CreditRequestService.getCreditRequestWithCreditDTO(id).then((response) => {
-                const request = response.data;
-                //setFinEval(financialEvaluation);
-                //setCredit(credits);
-                setRequest(request);
-            }).catch((error) => {
-                console.error("Error fetching request data:", error);
-                alert("Failed to load request data. Please try again.");
-            });
-        } else {
-            setTitleRequestForm("Nueva Solicitud");
+            setTitleFinEvalForm("Editar Evaluación Financiera");
+            FinEvalService.getCreditRequestWithCreditDTO(id)
+                .then((response) => {
+                    const finEvalData = response.data.finEval;
+                    setFinEval({
+                        ...finEvalData
+                    });
+                    const creditData = response.data.credits;
+                    setCredit({
+                        ...creditData
+                    })
+                })
+                .catch((error) => {
+                    console.error("Error fetching financial evaluation:", error);
+                });
         }
-    };
+    }, [id]);
 
-    useEffect(() => {
-        init();
-    }, [request,finEval,credits]);
 
+// You might want to call this in a useEffect
     useEffect(() => {
-       console.log(request);
-    }, [request,finEval,credits]);
+        if (id) {
+            fetchDocuments();
+        }
+    }, [id, finEval.documentsIds]);
 
     return (
         <Box
@@ -310,411 +446,376 @@ const AddEditRequest = () => {
             alignItems="center"
             justifyContent="center"
             component="form"
-            onSubmit={saveRequest}
+            onSubmit={saveFinEval}
         >
-            <h3> {titleRequestForm} </h3>
-            <hr />
-                <FormControl fullWidth>
-                    <InputLabel id="status-label">Tipo de Crédito</InputLabel>
-                    <Select
-                        id="type"
-                        labelId="Tipo de Crédito"
-                        value={request.type || ''}
-                        variant="standard"
-                        onChange={(e) => setRequest({
-                            ...request,
-                            credits: {
-                                ...request.credits,
-                                type: e.target.value
-                            }
-                        })}
-                    >
-                        <MenuItem value="propiedad1">para Primera Vivienda</MenuItem>
-                        <MenuItem value="propiedad2">para Segunda Vivienda</MenuItem>
-                        <MenuItem value="comercial">para Propiedades Comerciales</MenuItem>
-                        <MenuItem value="remodelacion">para Remodelación</MenuItem>
-                    </Select>
-                </FormControl>
+            <h3>{titleFinEvalForm}</h3>
+            <hr/>
 
-                <FormControl fullWidth>
-                    <Select
-                        id="type"
-                        label="Request Type"
-                        type="type"
-                        value={request.status}
-                        variant="standard"
-                        onChange={(e) => setRequest({
-                            ...request,
-                            finEval: {
-                                ...request.finEval,
-                                status: e.target.value
-                            }
-                        })}
-                    >
-                        <MenuItem value="E1">E1. En Revisión Inicial</MenuItem>
-                        <MenuItem value="E2">E2. Pendiente de Documentación.</MenuItem>
-                        <MenuItem value="E3">E3. En Evaluación.</MenuItem>
-                        <MenuItem value="E4">E4. Pre-Aprobada.</MenuItem>
-                        <MenuItem value="E5">E5. En Aprobación Final.</MenuItem>
-                        <MenuItem value="E6">E6. Aprobada.</MenuItem>
-                        <MenuItem value="E7">E7. Rechazada.</MenuItem>
-                        <MenuItem value="E8">E8. Cancelada por el Cliente.</MenuItem>
-                        <MenuItem value="E9">E9. En Desembolso.</MenuItem>
-                    </Select>
-                </FormControl>
+            {/* User ID Input */}
+            <FormControl fullWidth>
+                <TextField
+                    id="userId"
+                    label="User ID"
+                    type="number"
+                    value={finEval.userId ?? ''}
+                    variant="standard"
+                    onChange={handleInputChange}
+                />
+            </FormControl>
 
-                <FormControl fullWidth>
-                    <TextField
-                        id="maxPayTerm"
-                        label="MaxPayTerm"
-                        type="number"
-                        value={request.maxPayTerm}
-                        variant="standard"
-                        onChange={(e) => setRequest({
-                            ...request,
-                            credits: {
-                                ...request.maxPayTerm,
-                                type: e.target.valueAsNumber
-                            }
-                        })}
-                        helperText="Plazo Máximo"
+            {/* Status Dropdown */}
+            <FormControl fullWidth>
+                <TextField
+                    name="status"
+                    label="Status"
+                    select
+                    value={finEval.status}
+                    variant="standard"
+                    onChange={handleInputChange}
+                >
+                    <MenuItem value="E1">E1. En Revisión Inicial.</MenuItem>
+                    <MenuItem value="E2">E2. Pendiente de Documentación.</MenuItem>
+                    <MenuItem value="E3">E3. En Evaluación.</MenuItem>
+                    <MenuItem value="E4">E4. Pre-Aprobada.</MenuItem>
+                    <MenuItem value="E5">E5. En Aprobación Final.</MenuItem>
+                    <MenuItem value="E6">E6. Aprobada.</MenuItem>
+                    <MenuItem value="E7">E7. Rechazada.</MenuItem>
+                    <MenuItem value="E8">E8. Cancelada por el Cliente.</MenuItem>
+                    <MenuItem value="E9">E9. En Desembolso.</MenuItem>
+                </TextField>
+            </FormControl>
+
+            {/* Numeric Inputs */}
+            <FormControl fullWidth>
+                <TextField
+                    id="monthlyCreditFee"
+                    label="Monthly Credit Fee"
+                    type="number"
+                    value={finEval.monthlyCreditFee || ''}
+                    variant="standard"
+                    onChange={handleInputChange}
+                />
+            </FormControl>
+
+            <FormControl fullWidth>
+                <TextField
+                    id="monthlyClientIncome"
+                    label="Monthly Client Income"
+                    type="number"
+                    value={finEval.monthlyClientIncome ?? ''}
+                    variant="standard"
+                    onChange={handleInputChange}
+                />
+            </FormControl>
+
+            <FormControl fullWidth>
+                <TextField
+                    id="currentJobAntiquity"
+                    label="Current Job Antiquity"
+                    type="number"
+                    value={finEval.currentJobAntiquity ?? ''}
+                    variant="standard"
+                    onChange={handleInputChange}
+                />
+            </FormControl>
+
+            <FormControl fullWidth>
+                <TextField
+                    id="monthlyDebt"
+                    label="Monthly Debt"
+                    type="number"
+                    value={finEval.monthlyDebt ?? ''}
+                    variant="standard"
+                    onChange={handleInputChange}
+                />
+            </FormControl>
+
+            <FormControl fullWidth>
+                <TextField
+                    id="bankAccountBalance"
+                    label="Bank Account Balance"
+                    type="number"
+                    value={finEval.bankAccountBalance ?? ''}
+                    variant="standard"
+                    onChange={handleInputChange}
+                />
+            </FormControl>
+
+            <FormControl fullWidth>
+                <TextField
+                    id="biggestWithdrawalInLastYear"
+                    label="biggest Withdrawal In Last Year"
+                    type="number"
+                    value={finEval.biggestWithdrawalInLastYear ?? ''}
+                    variant="standard"
+                    onChange={handleInputChange}
+                />
+            </FormControl>
+
+            <FormControl fullWidth>
+                <TextField
+                    id="totalDepositsInLastYear"
+                    label="Total Deposits In Last Year"
+                    type="number"
+                    value={finEval.totalDepositsInLastYear ?? ''}
+                    variant="standard"
+                    onChange={handleInputChange}
+                />
+            </FormControl>
+
+            <FormControl fullWidth>
+                <TextField
+                    id="bankAccountAge"
+                    label="Bank Account Age"
+                    type="number"
+                    value={finEval.bankAccountAge ?? ''}
+                    variant="standard"
+                    onChange={handleInputChange}
+                />
+            </FormControl>
+
+            <FormControl fullWidth>
+                <TextField
+                    id="biggestWithdrawalInLastSemester"
+                    label="biggest Withdrawal In Last Semester"
+                    type="number"
+                    value={finEval.biggestWithdrawalInLastSemester ?? ''}
+                    variant="standard"
+                    onChange={handleInputChange}
+                />
+            </FormControl>
+
+            {/* Checkbox Inputs */}
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        id="hasSufficientDocuments"
+                        checked={finEval.hasSufficientDocuments}
+                        onChange={handleInputChange}
                     />
-                </FormControl>
+                }
+                label="Has Sufficient Documents"
+            />
 
-                <FormControl fullWidth>
-                    <TextField
-                        id="annualInterest"
-                        label="AnnualInterest"
-                        type="number"
-                        value={request.annualInterestRate}
-                        variant="standard"
-                        onChange={(e) => setRequest({
-                            ...request,
-                            credits: {
-                                ...request.annualInterestRate,
-                                type: e.target.valueAsNumber
-                            }
-                        })}
-                        helperText="Interés Anual"
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        id="hasGoodCreditHistory"
+                        checked={finEval.hasGoodCreditHistory}
+                        onChange={handleInputChange}
                     />
-                </FormControl>
+                }
+                label="Has Good Credit History"
+            />
 
-                <FormControl fullWidth>
-                    <TextField
-                        id="maxFinanceAmount"
-                        label="MaxFinanceAmount"
-                        type="number"
-                        value={request.maxFinanceAmount}
-                        variant="standard"
-                        onChange={(e) => setRequest({
-                            ...request,
-                            credits: {
-                                ...request.maxFinanceAmount,
-                                type: e.target.valueAsNumber
-                            }
-                        })}
-                        helperText="Monto Máximo"
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        id="isSelfEmployed"
+                        checked={finEval.isSelfEmployed}
+                        onChange={handleInputChange}
                     />
-                </FormControl>
+                }
+                label="Is Self Employed"
+            />
 
-                <FormControl fullWidth>
-                    <TextField
-                        id="propertyValue"
-                        label="PropertyValue"
-                        type="number"
-                        value={request.propertyValue}
-                        variant="standard"
-                        onChange={(e) => setRequest({
-                            ...request,
-                            credits: {
-                                ...request.propertyValue,
-                                type: e.target.valueAsNumber
-                            }
-                        })}
-                        helperText="Valor de la Propiedad"
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        id="hasGoodIncomeHistory"
+                        checked={finEval.hasGoodIncomeHistory}
+                        onChange={handleInputChange}
                     />
-                </FormControl>
+                }
+                label="Has Good Income History"
+            />
 
-                <FormControl fullWidth>
-                    <TextField
-                        id="requestedAmount"
-                        label="RequestedAmount"
-                        type="number"
-                        value={request.requestedAmount}
-                        variant="standard"
-                        onChange={(e) => setRequest({
-                            ...request,
-                            credits: {
-                                ...request.requestedAmount,
-                                type: e.target.valueAsNumber
-                            }
-                        })}
-                    >
-                        <MenuItem value="vivienda1">para Primera Vivienda</MenuItem>
-                        <MenuItem value="vivienda2">para Segunda Vivienda</MenuItem>
-                        <MenuItem value="comercial">para Propiedades Comerciales</MenuItem>
-                        <MenuItem value="remodelacion">para Remodelación</MenuItem>
-                    </TextField>
-                </FormControl>
 
-                {/* Subir documento */}
-                <FormControl fullWidth>
-                    <input type="file" onChange={(e) => setNewDocument(e.target.files[0])} />
-                    {/*startIcon={<UploadIcon />}*/}
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleUploadDocuments} >
-                        Subir Documento a Sistema
-                    </Button>
-                </FormControl>
+            {/* CREDIT */}
 
-                {/* Lista de documentos + descargar + eliminar*/}
-                {/*startIcon={<DownloadIcon />}*/}
+            {/* Status Dropdown */}
+            <FormControl fullWidth>
+                <TextField
+                    name="type"
+                    label="Credit Type"
+                    select
+                    value={credit.type || ''}
+                    variant="standard"
+                    onChange={handleCreditInputChange}
+                >
+                    <MenuItem value="propiedad1">para Primera Vivienda</MenuItem>
+                    <MenuItem value="propiedad2">para Segunda Vivienda</MenuItem>
+                    <MenuItem value="comercial">para Propiedades Comerciales</MenuItem>
+                    <MenuItem value="remodelacion">para Remodelación</MenuItem>
+                </TextField>
+            </FormControl>
+
+            <FormControl fullWidth>
+                <TextField
+                    name="maxPayTerm"
+                    label="Maximum Pay Term"
+                    type="number"
+                    value={credit.maxPayTerm ?? ''}
+                    variant="standard"
+                    onChange={handleCreditInputChange}
+                />
+            </FormControl>
+
+            <FormControl fullWidth>
+                <TextField
+                    name="annualInterestRate"
+                    label="Annual Interest Rate"
+                    type="number"
+                    step="0.01"  // Allows decimal input
+                    value={credit.annualInterestRate ?? ''}
+                    variant="standard"
+                    onChange={handleCreditInputChange}
+                />
+            </FormControl>
+
+            <FormControl fullWidth>
+                <TextField
+                    name="maxFinanceAmount"
+                    label="Maximum Finance Amount"
+                    type="number"
+                    step="0.01"  // Allows decimal input
+                    value={credit.maxFinanceAmount ?? ''}
+                    variant="standard"
+                    onChange={handleCreditInputChange}
+                />
+            </FormControl>
+
+            <FormControl fullWidth>
+                <TextField
+                    name="propertyValue"
+                    label="Property Value"
+                    type="number"
+                    value={credit.propertyValue ?? ''}
+                    variant="standard"
+                    onChange={handleCreditInputChange}
+                />
+            </FormControl>
+
+            <FormControl fullWidth>
+                <TextField
+                    name="requestedAmount"
+                    label="Requested Amount"
+                    type="number"
+                    value={credit.requestedAmount ?? ''}
+                    variant="standard"
+                    onChange={handleCreditInputChange}
+                />
+            </FormControl>
+
+            {renderFeesInput()}
+
+            {/* Lista de documentos + descargar + eliminar*/}
+            {/* Document Upload Section */}
+            <FormControl fullWidth>
+                <input
+                    type="file"
+                    multiple
+                    onChange={handleFileSelect}
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                />
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() =>handleUploadDocuments(finEval.finEvalId)}
+                    disabled={!id || selectedFiles.length === 0}
+                >
+                    Upload Documents
+                </Button>
+            </FormControl>
+
+            {/* File Preview Section */}
+            {filePreview.length > 0 && (
                 <div>
-                    <h4>Documents</h4>
-                    {documents.length > 0 ? documents.map(doc => (
-                        <div key={doc.id}>
-                            <span>{doc.name}</span>
-                            <Button onClick={() => downloadDocument(doc.id)} >
-                                Descargar
-                            </Button>
-                            <Button onClick={() => deleteDocument(doc.id)}  color="error">
-                                Eliminar
+                    <h4>Selected Files:</h4>
+                    {filePreview.map((file, index) => (
+                        <div key={index} style={{ display: 'flex', alignItems: 'center', margin: '10px 0' }}>
+                            <img
+                                src={file.preview}
+                                alt={file.name}
+                                style={{
+                                    width: '50px',
+                                    height: '50px',
+                                    objectFit: 'cover',
+                                    marginRight: '10px'
+                                }}
+                            />
+                            <div>
+                                <p>{file.name} ({Math.round(file.size / 1024)} KB)</p>
+                            </div>
+                            <Button
+                                variant="outlined"
+                                color="error"
+                                onClick={() => removeFilePreview(index)}
+                                startIcon={<DeleteIcon />}
+                            >
+                                Remove
                             </Button>
                         </div>
-                    )) : <p>No hay documentos disponibles.</p>}
+                    ))}
                 </div>
-
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={request.hasSufficientDocuments}
-                            onChange={(e) => setRequest({
-                                ...request,
-                                finEval: {
-                                    ...request.hasSufficientDocuments,
-                                    type: e.target.checked
-                                }
-                            })}
+            )}
+            {/*startIcon={<DownloadIcon />}*/}
+            <div>
+                <h4>Documents</h4>
+                {documents.length > 0 ? documents.map(doc => (
+                    <div key={doc.id}>
+                        <span>{doc.name}</span>
+                        <Button onClick={() => downloadDocument(doc.id)} >
+                            Descargar
+                        </Button>
+                        <Button onClick={() => openDocumentPreview(doc.id)}>
+                            Vista Previa
+                        </Button>
+                        <Button onClick={() => deleteDocument(doc.id)}  color="error">
+                            Eliminar
+                        </Button>
+                    </div>
+                )) : <p>No hay documentos disponibles.</p>}
+            </div>
+            {/*renderDocumentUpload()*/}
+            {/* Document Preview Dialog */}
+            <Dialog
+                open={!!previewDocument}
+                onClose={() => {
+                    URL.revokeObjectURL(previewDocument);
+                    setPreviewDocument(null);
+                }}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogTitle>Vista Previa del Documento</DialogTitle>
+                <DialogContent>
+                    {previewDocument && (
+                        <iframe
+                            src={previewDocument}
+                            width="100%"
+                            height="500px"
+                            title="Document Preview"
                         />
-                    }
-                    label="Has Sufficient Documents"
-                />
+                    )}
+                </DialogContent>
+            </Dialog>
 
-                <FormControl fullWidth>
-                    <TextField
-                        id="monthlyCreditFee"
-                        label="Monthly Credit Fee"
-                        type="number"
-                        value={request.monthlyCreditFee}
-                        variant="standard"
-                        onChange={(e) => setRequest({
-                            ...request,
-                            finEval: {
-                                ...request.finEval,
-                                monthlyCreditFee: e.target.valueAsNumber
-                            }
-                        })}
-                    />
-                </FormControl>
-
-                <FormControl fullWidth>
-                    <TextField
-                        id="monthlyClientIncome"
-                        label="MonthlyClientIncome"
-                        type="number"
-                        value={request.monthlyClientIncome}
-                        variant="standard"
-                        onChange={(e) => setRequest( {
-                            ...request,
-                            finEval: {
-                                ...request.finEval,
-                                monthlyClientIncome: e.target.valueAsNumber
-                            }
-                        })}
-                        helperText="Ingresos Mensuales"
-                    />
-                </FormControl>
-
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={request.hasGoodCreditHistory}
-                            onChange={(e) => setRequest({
-                                ...request,
-                                finEval: {
-                                    ...request.hasGoodCreditHistory,
-                                    type: e.target.checked
-                                }
-                            })}
-                        />
-                    }
-                    label="Has Good Credit History?"
-                />
-
-                <FormControl fullWidth>
-                    <TextField
-                        id="currentJobAntiquity"
-                        label="CurrentJobAntiquity"
-                        type="number"
-                        value={request.currentJobAntiquity}
-                        variant="standard"
-                        onChange={(e) => setRequest( {
-                            ...request,
-                            finEval: {
-                                ...request.finEval,
-                                currentJobAntiquity: e.target.valueAsNumber
-                            }
-                        })}
-                        helperText="Antiguedad en trabajo actual (meses)"
-                    />
-                </FormControl>
-
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={request.isSelfEmployed}
-                            onChange={(e) => setRequest({
-                                ...request,
-                                finEval: {
-                                    ...request.isSelfEmployed,
-                                    type: e.target.checked
-                                }
-                            })}
-                        />
-                    }
-                    label="Is Self Employed?"
-                />
-
-                <FormControl fullWidth>
-                    <TextField
-                        id="monthlyDebt"
-                        label="MonthlyDebt"
-                        type="number"
-                        value={request.monthlyDebt}
-                        variant="standard"
-                        onChange={(e) => setRequest( {
-                            ...request,
-                            finEval: {
-                                ...request.finEval,
-                                monthlyDebt: e.target.valueAsNumber
-                            }
-                        })}
-                        helperText="Monthly Debt"
-                    />
-                </FormControl>
-
-                <FormControl fullWidth>
-                    <TextField
-                        id="bankAccountBalance"
-                        label="BankAccountBalance"
-                        type="number"
-                        value={request.bankAccountBalance}
-                        variant="standard"
-                        onChange={(e) => setRequest( {
-                            ...request,
-                            finEval: {
-                                ...request.finEval,
-                                bankAccountBalance: e.target.valueAsNumber
-                            }
-                        })}
-                        helperText="Bank Account Balance"
-                    />
-                </FormControl>
-
-                <FormControl fullWidth>
-                    <TextField
-                        id="bankAccountAge"
-                        label="BankAccountAge"
-                        type="number"
-                        value={request.bankAccountAge}
-                        variant="standard"
-                        onChange={(e) => setRequest( {
-                            ...request,
-                            finEval: {
-                                ...request.finEval,
-                                bankAccountAge: e.target.valueAsNumber
-                            }
-                        })}
-                        helperText="Bank Account Age"
-                    />
-                </FormControl>
-
-                <FormControl fullWidth>
-                    <TextField
-                        id="biggestWithdrawalInLastYear"
-                        label="BiggestWithdrawalInLastYear"
-                        type="number"
-                        value={request.biggestWithdrawalInLastYear}
-                        variant="standard"
-                        onChange={(e) => setRequest( {
-                            ...request,
-                            finEval: {
-                                ...request.finEval,
-                                biggestWithdrawalInLastYear: e.target.valueAsNumber
-                            }
-                        })}
-                        helperText="Retiro más grande de los últimos 12 meses"
-                    />
-                </FormControl>
-
-                <FormControl fullWidth>
-                    <TextField
-                        id="biggestWithdrawalInLastSemester"
-                        label="BiggestWithdrawalInLastSemester"
-                        type="number"
-                        value={request.biggestWithdrawalInLastSemester}
-                        variant="standard"
-                        onChange={(e) => setRequest( {
-                            ...request,
-                            finEval: {
-                                ...request.finEval,
-                                biggestWithdrawalInLastSemester: e.target.valueAsNumber
-                            }
-                        })}
-                        helperText="Retiro más grande de los últimos 12 meses"
-                    />
-                </FormControl>
-
-                <h4>Extra Fees:</h4>
-                {extraFees.map((fee, index) => (
-                    <Box key={index} display="flex" alignItems="center" mb={1}>
-                        <TextField
-                            label={`Extra Fee ${index + 1}`}
-                            type="number"
-                            value={fee}
-                            onChange={(e) => handleExtraFeeChange(index, e.target.value)}
-                            variant="standard"
-                            inputProps={{ step: "0.01" }} // Allows decimal input
-                            style={{ width: "150px", marginRight: "8px" }}
-                        />
-                        <IconButton onClick={() => removeExtraFee(index)} color="error">
-                            Delete
-                        </IconButton>
-                    </Box>
-                ))}
-                <Button variant="outlined" onClick={addExtraFee}>
-                    Add Extra Fee
+            <FormControl>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    color="info"
+                    startIcon={<SaveIcon />}
+                >
+                    Save
                 </Button>
+            </FormControl>
 
-
-                <FormControl>
-                    <br />
-                    <Button
-                        variant="contained"
-                        color="info"
-                        onClick={saveRequest}
-                        style={{ marginLeft: "0.5rem" }}
-                        startIcon={<SaveIcon />}
-                    >
-                        Grabar
-                    </Button>
-                </FormControl>
-            <hr />
+            <hr/>
             <Link to="/request/list">Back to List</Link>
         </Box>
     );
 };
 
-export default AddEditRequest;
+export default AddEditFinEval;

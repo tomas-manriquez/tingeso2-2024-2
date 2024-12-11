@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import CreditRequestService from "../services/m3-solicitud-credito.service.js";
 import TrackRequestService from "../services/m5-seguimiento-solicitud.service.js"
+import CreditEvalService from "../services/m4-evaluacion-credito.service.js";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell  from "@mui/material/TableCell";
@@ -22,8 +23,8 @@ const RequestList = () => {
 
     const navigate = useNavigate();
 
-    const init = () => {
-        CreditRequestService
+    const init = async () => {
+        await CreditRequestService
             .getAllCreditRequestsWithCredits()
             .then((response) => {
                 console.log("Mostrando listado de todos las Solicitudes", response.data);
@@ -77,6 +78,16 @@ const RequestList = () => {
                 console.log("Error tracking request", error);
                 setTrackDetails('No se pudieron obtener los detalles de seguimiento');
                 setOpenDialog(true);
+            });
+    };
+
+    const handleEval= (id) =>{
+        CreditEvalService.requestEvaluation(id)
+            .then((response) => {
+                console.log("Evaluacion realizada: ",response.data)
+            })
+            .catch((error) => {
+                console.log("Error evaluating request", error);
             });
     };
 
@@ -177,6 +188,17 @@ const RequestList = () => {
                                         </Button>
                                     </DialogActions>
                                 </Dialog>
+
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    size="small"
+                                    onClick={() => handleEval(request.finEval.finEvalId)}
+                                    style={{ marginLeft: "0.5rem" }}
+                                    startIcon={<InfoIcon />}
+                                >
+                                    Evaluacion
+                                </Button>
                             </TableCell>
                         </TableRow>
                     ))}

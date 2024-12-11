@@ -17,7 +17,6 @@ spec:
       containers:
         - name: frontend-deployment
           image: tomasmanriquez480/tingeso-frontend:latest
-          imagePullPolicy: "Always"
           ports:
             - containerPort: 80
           env:
@@ -40,4 +39,4 @@ spec:
       port: 80
       targetPort: 80
       nodePort: 30100
-  type: LoadBalancer
+  type: NodePort

@@ -4,7 +4,7 @@ const example = () =>{
     return httpClient.get('credit-eval/example');
 }
 
-const requestEvaluation = () =>{
+const requestEvaluation = (id) =>{
     return httpClient.post(`/credit-eval/${id}`)
 }
 
