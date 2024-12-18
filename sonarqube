@@ -1,0 +1,6 @@
+mvn clean verify sonar:sonar \
+  -Dmaven.test.skip=true \
+  -Dsonar.projectKey=tingeso3 \
+  -Dsonar.projectName='tingeso3' \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.token=sqp_9a40712b75ad1d784d8c62bc0f694a5ddb31a37c

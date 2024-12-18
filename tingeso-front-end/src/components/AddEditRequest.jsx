@@ -165,7 +165,7 @@ const AddEditFinEval = () => {
         };
 
         try {
-            if (!finEval.finEvalId || !credit.finEvalId || finEval.finEvalId !== credit.finEvalId) {
+            if (!finEval.finEvalId || !credit.finEvalId ) {
                 // Create a new financial evaluation + credit object
                 const response = await FinEvalService.createFinEvalWithCredits(request);
                 console.log("Financial Evaluation + Credit created successfully:", response.data);
@@ -416,14 +416,17 @@ const AddEditFinEval = () => {
             setTitleFinEvalForm("Editar Evaluación Financiera");
             FinEvalService.getCreditRequestWithCreditDTO(id)
                 .then((response) => {
+                    console.log(response.data);
                     const finEvalData = response.data.finEval;
                     setFinEval({
                         ...finEvalData
                     });
                     const creditData = response.data.credits;
+                    if (creditData != null){
                     setCredit({
-                        ...creditData
+                    ...creditData
                     })
+                }
                 })
                 .catch((error) => {
                     console.error("Error fetching financial evaluation:", error);
